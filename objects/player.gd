@@ -270,7 +270,7 @@ func change_weapon():
 		
 	# Set weapon data
 	
-	raycast.target_position = Vector3(0, 0, -1) * weapon.max_distance
+	raycast.target_position = Vector3(0, 0, -10000000)
 	crosshair.texture = weapon.crosshair
 
 func damage(amount):
