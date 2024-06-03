@@ -46,14 +46,12 @@ signal health_updated
 # Functions
 
 func _ready():
-	
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
 	weapon = weapons[weapon_index] # Weapon must never be nil
 	initiate_change_weapon(weapon_index)
 
 func _physics_process(delta):
-	
 	# Handle functions
 	
 	handle_controls(delta)
@@ -107,16 +105,13 @@ func _physics_process(delta):
 
 func _input(event):
 	if event is InputEventMouseMotion and mouse_captured:
-		
 		input_mouse = event.relative / mouse_sensitivity
 		
 		rotation_target.y -= event.relative.x / mouse_sensitivity
 		rotation_target.x -= event.relative.y / mouse_sensitivity
 
 func handle_controls(_delta):
-	
 	# Mouse capture
-	
 	if Input.is_action_just_pressed("mouse_capture"):
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		mouse_captured = true
@@ -147,7 +142,6 @@ func handle_controls(_delta):
 	# Jumping
 	
 	if Input.is_action_just_pressed("jump"):
-		
 		if jump_single or jump_double:
 			Audio.play("sounds/jump_a.ogg, sounds/jump_b.ogg, sounds/jump_c.ogg")
 		
@@ -165,7 +159,6 @@ func handle_controls(_delta):
 # Handle gravity
 
 func handle_gravity(delta):
-	
 	gravity += 20 * delta
 	
 	if gravity > 0 and is_on_floor():
@@ -176,7 +169,6 @@ func handle_gravity(delta):
 # Jumping
 
 func action_jump():
-	
 	gravity = -jump_strength
 	
 	jump_single = false;
@@ -185,11 +177,7 @@ func action_jump():
 # Shooting
 
 func action_shoot():
-	
-	if Input.is_action_pressed("shoot"):
-	
-		if !blaster_cooldown.is_stopped(): return # Cooldown for shooting
-		
+	if Input.is_action_pressed("shoot") and blaster_cooldown.is_stopped():
 		Audio.play(weapon.sound_shoot)
 		
 		container.position.z += 0.25 # Knockback of weapon visual
@@ -209,13 +197,13 @@ func action_shoot():
 		# Shoot the weapon, amount based on shot count
 		
 		for n in weapon.shot_count:
-		
 			raycast.target_position.x = randf_range(-weapon.spread, weapon.spread)
 			raycast.target_position.y = randf_range(-weapon.spread, weapon.spread)
 			
 			raycast.force_raycast_update()
 			
-			if !raycast.is_colliding(): continue # Don't create impact when raycast didn't hit
+			if !raycast.is_colliding():
+				continue # Don't create impact when raycast didn't hit
 			
 			var collider = raycast.get_collider()
 			
@@ -239,7 +227,6 @@ func action_shoot():
 # Toggle between available weapons (listed in 'weapons')
 
 func action_weapon_toggle():
-	
 	if Input.is_action_just_pressed("weapon_toggle"):
 		
 		weapon_index = wrap(weapon_index + 1, 0, weapons.size())
@@ -250,7 +237,6 @@ func action_weapon_toggle():
 # Initiates the weapon changing animation (tween)
 
 func initiate_change_weapon(index):
-	
 	weapon_index = index
 	
 	tween = get_tree().create_tween()
