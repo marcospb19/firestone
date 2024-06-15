@@ -12,7 +12,7 @@ func _ready():
 		var p = AudioStreamPlayer.new()
 		self.add_child(p)
 		available.append(p)
-		p.volume_db = -10
+		p.volume_db = -30
 		p.finished.connect(_on_stream_finished.bind(p))
 		p.bus = bus
 
