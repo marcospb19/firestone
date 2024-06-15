@@ -11,14 +11,17 @@ var time := 0.0
 var target_position: Vector3
 var destroyed := false
 
+
 func _ready():
 	target_position = position
+
 
 func _process(delta):
 	self.look_at(player.position + Vector3(0, 0.5, 0), Vector3.UP, true)  # Look at player
 	target_position.y += (cos(time * 5) * 1) * delta  # Sine movement (up and down)
 	time += delta
 	position = target_position
+
 
 # Take damage from player
 func damage(amount):

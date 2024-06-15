@@ -16,8 +16,10 @@ func _ready():
 		p.finished.connect(_on_stream_finished.bind(p))
 		p.bus = bus
 
+
 func _on_stream_finished(stream):
 	available.append(stream)
+
 
 func play(sounds):
 	if sounds is String:
@@ -26,7 +28,8 @@ func play(sounds):
 		var sound = sounds[randi() % sounds.size()]
 		queue.append("res://" + sound)
 	else:
-		push_error('invalid sound path!')
+		push_error("invalid sound path!")
+
 
 func _process(_delta):
 	if not queue.is_empty() and not available.is_empty():

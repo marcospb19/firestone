@@ -31,11 +31,13 @@ var movement_velocity: Vector3
 var weapon: Weapon
 var tween: Tween
 
+
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
-	weapon = weapons[weapon_index] # Weapon must never be null
+	weapon = weapons[weapon_index]  # Weapon must never be null
 	initiate_change_weapon(weapon_index)
+
 
 func _physics_process(delta):
 	# Handle functions
@@ -47,7 +49,7 @@ func _physics_process(delta):
 	# Movement
 	var applied_velocity: Vector3
 	
-	movement_velocity = transform.basis * movement_velocity # Move forward
+	movement_velocity = transform.basis * movement_velocity  # Move forward
 	
 	applied_velocity = velocity.lerp(movement_velocity, delta * 10)
 	applied_velocity.y = -gravity
@@ -58,7 +60,9 @@ func _physics_process(delta):
 	camera.rotation.x = rotation_target.x
 	rotation.y = rotation_target.y
 	
-	container.position = lerp(container.position, container_offset - (applied_velocity / 30), delta * 10)
+	container.position = lerp(
+		container.position, container_offset - (applied_velocity / 30), delta * 10
+	)
 	
 	# Movement sound
 	sound_footsteps.stream_paused = true
@@ -67,10 +71,10 @@ func _physics_process(delta):
 		if abs(velocity.x) > 1 or abs(velocity.z) > 1:
 			sound_footsteps.stream_paused = false
 	
-	 #Landing after jump or falling
+	#Landing after jump or falling
 	camera.position.y = lerp(camera.position.y, 0.0, delta * 5)
 	
-	if self.is_on_floor() and gravity > 1 and !previously_floored: # Landed
+	if self.is_on_floor() and gravity > 1 and !previously_floored:  # Landed
 		Audio.play("sounds/land.ogg")
 		camera.position.y = -0.1
 	
@@ -80,10 +84,12 @@ func _physics_process(delta):
 	if position.y < -10:
 		self.get_tree().reload_current_scene()
 
+
 func _input(event):
 	if event is InputEventMouseMotion and mouse_captured:
 		rotation_target.y -= event.relative.x * mouse_sensitivity
 		rotation_target.x -= event.relative.y * mouse_sensitivity
+
 
 func handle_controls(delta: float):
 	# Mouse capture
@@ -101,9 +107,13 @@ func handle_controls(delta: float):
 	movement_velocity = Vector3(input.x, 0, input.y).normalized() * movement_speed
 	
 	# Rotation
-	var rotation_input := Input.get_vector("camera_right", "camera_left", "camera_down", "camera_up")
+	var rotation_input := Input.get_vector(
+		"camera_right", "camera_left", "camera_down", "camera_up"
+	)
 	
-	rotation_target -= Vector3(-rotation_input.y, -rotation_input.x, 0).limit_length(1.0) * gamepad_sensitivity
+	rotation_target -= (
+		Vector3(-rotation_input.y, -rotation_input.x, 0).limit_length(1.0) * gamepad_sensitivity
+	)
 	rotation_target.x = clamp(rotation_target.x, deg_to_rad(-90), deg_to_rad(90))
 	
 	action_shoot()
@@ -123,17 +133,19 @@ func handle_controls(delta: float):
 	# Weapon switching
 	action_weapon_toggle()
 
+
 func action_jet(delta: float):
 	if Input.is_action_pressed("jetpack"):
 		gravity -= jet_strength * delta
+
 
 func action_shoot():
 	if Input.is_action_pressed("shoot") and blaster_cooldown.is_stopped():
 		Audio.play(weapon.sound_shoot)
 		
-		container.position.z += 0.25 # Knockback of weapon visual
-		camera.rotation.x += 0.025 # Knockback of camera
-		movement_velocity += Vector3.BACK * weapon.knockback # Knockback
+		container.position.z += 0.25  # Knockback of weapon visual
+		camera.rotation.x += 0.025  # Knockback of camera
+		movement_velocity += Vector3.BACK * weapon.knockback  # Knockback
 		
 		# Set muzzle flash position, play animation
 		muzzle.play("default")
@@ -152,7 +164,7 @@ func action_shoot():
 			raycast.force_raycast_update()
 			
 			if !raycast.is_colliding():
-				continue # Don't create impact when raycast didn't hit
+				continue  # Don't create impact when raycast didn't hit
 			
 			var collider = raycast.get_collider()
 			
@@ -168,8 +180,11 @@ func action_shoot():
 			
 			self.get_tree().root.add_child(impact_instance)
 			
-			impact_instance.position = raycast.get_collision_point() + (raycast.get_collision_normal() / 10)
-			impact_instance.look_at(camera.global_transform.origin, Vector3.UP, true) 
+			impact_instance.position = (
+				raycast.get_collision_point() + (raycast.get_collision_normal() / 10)
+			)
+			impact_instance.look_at(camera.global_transform.origin, Vector3.UP, true)
+
 
 # Toggle between available weapons (listed in 'weapons')
 func action_weapon_toggle():
@@ -179,13 +194,15 @@ func action_weapon_toggle():
 		
 		Audio.play("sounds/weapon_change.ogg")
 
+
 # Initiates the weapon changing animation (tween)
 func initiate_change_weapon(index):
 	weapon_index = index
 	tween = get_tree().create_tween()
 	tween.set_ease(Tween.EASE_OUT_IN)
 	tween.tween_property(container, "position", container_offset - Vector3(0, 1, 0), 0.1)
-	tween.tween_callback(change_weapon) # Changes the model
+	tween.tween_callback(change_weapon)  # Changes the model
+
 
 # Switches the weapon model (off-screen)
 func change_weapon():
@@ -210,9 +227,10 @@ func change_weapon():
 	raycast.target_position = Vector3(0, 0, -10000000)
 	crosshair.texture = weapon.crosshair
 
+
 func damage(amount):
 	health -= amount
-	health_updated.emit(health) # Update health on HUD
+	health_updated.emit(health)  # Update health on HUD
 	
 	if health < 0:
-		get_tree().reload_current_scene() # Reset when out of health
+		get_tree().reload_current_scene()  # Reset when out of health
