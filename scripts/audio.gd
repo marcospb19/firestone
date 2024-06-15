@@ -16,10 +16,8 @@ func _ready():
 		p.finished.connect(_on_stream_finished.bind(p))
 		p.bus = bus
 
-
 func _on_stream_finished(stream):
 	available.append(stream)
-
 
 func play(sounds):
 	if sounds is String:
@@ -35,5 +33,5 @@ func _process(_delta):
 		available[0].stream = load(queue.pop_front())
 		available[0].play()
 		available[0].pitch_scale = randf_range(0.9, 1.1)
-
+		
 		available.pop_front()
