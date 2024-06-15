@@ -4,43 +4,33 @@ extends CharacterBody3D
 @export var movement_speed = 5
 @export var jump_strength = 4
 @export var jet_strength = 23
-
 @export_subgroup("Weapons")
 @export var weapons: Array[Weapon] = []
-
-var weapon: Weapon
-var weapon_index := 0
-
-var mouse_captured := true
-var mouse_input: Vector2
-
-var mouse_sensitivity := 500
-var gamepad_sensitivity := 0.075
-
-var movement_velocity: Vector3
-var rotation_target: Vector3
-
-var health := 100
-var gravity := 0.0
-
-var previously_floored := false
-
-var jump := true
-
-var container_offset = Vector3(1.2, -1.1, -2.75)
-
-var tween: Tween
+@export var crosshair: TextureRect
 
 signal health_updated
 
-@onready var camera = $Head/Camera
-@onready var raycast = $Head/Camera/RayCast
-@onready var muzzle = $Head/Camera/SubViewportContainer/SubViewport/CameraItem/Muzzle
-@onready var container = $Head/Camera/SubViewportContainer/SubViewport/CameraItem/Container
-@onready var sound_footsteps = $SoundFootsteps
-@onready var blaster_cooldown = $Cooldown
+@onready var camera := $Head/Camera
+@onready var raycast := $Head/Camera/RayCast
+@onready var muzzle := $Head/Camera/SubViewportContainer/SubViewport/CameraItem/Muzzle
+@onready var container := $Head/Camera/SubViewportContainer/SubViewport/CameraItem/Container
+@onready var sound_footsteps := $SoundFootsteps
+@onready var blaster_cooldown := $Cooldown
 
-@export var crosshair:TextureRect
+var weapon: Weapon
+var weapon_index := 0
+var mouse_captured := true
+var mouse_input: Vector2
+var mouse_sensitivity := 500
+var gamepad_sensitivity := 0.075
+var movement_velocity: Vector3
+var rotation_target: Vector3
+var health := 100
+var gravity := 0.0
+var previously_floored := false
+var jump := true
+var container_offset := Vector3(1.2, -1.1, -2.75)
+var tween: Tween
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
