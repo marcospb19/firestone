@@ -1,5 +1,6 @@
-extends Resource
 class_name Weapon
+
+extends Resource
 
 @export_subgroup("Model")
 @export var model: PackedScene  # Model of the weapon

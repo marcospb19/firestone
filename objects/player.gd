@@ -1,5 +1,7 @@
 extends CharacterBody3D
 
+signal health_updated
+
 @export_subgroup("Properties")
 @export var movement_speed = 5
 @export var jump_strength = 4
@@ -7,15 +9,6 @@ extends CharacterBody3D
 @export_subgroup("Weapons")
 @export var weapons: Array[Weapon] = []
 @export var crosshair: TextureRect
-
-signal health_updated
-
-@onready var camera := $Head/Camera
-@onready var raycast := $Head/Camera/RayCast
-@onready var muzzle := $Head/Camera/SubViewportContainer/SubViewport/CameraItem/Muzzle
-@onready var container := $Head/Camera/SubViewportContainer/SubViewport/CameraItem/Container
-@onready var sound_footsteps := $SoundFootsteps
-@onready var blaster_cooldown := $Cooldown
 
 var weapon_index := 0
 var mouse_captured := true
@@ -30,6 +23,13 @@ var rotation_target: Vector3
 var movement_velocity: Vector3
 var weapon: Weapon
 var tween: Tween
+
+@onready var camera := $Head/Camera
+@onready var raycast := $Head/Camera/RayCast
+@onready var muzzle := $Head/Camera/SubViewportContainer/SubViewport/CameraItem/Muzzle
+@onready var container := $Head/Camera/SubViewportContainer/SubViewport/CameraItem/Container
+@onready var sound_footsteps := $SoundFootsteps
+@onready var blaster_cooldown := $Cooldown
 
 
 func _ready():
@@ -173,8 +173,8 @@ func action_shoot():
 				collider.damage(weapon.damage)
 			
 			# Creating an impact animation
-			var impact = preload("res://objects/impact.tscn")
-			var impact_instance = impact.instantiate()
+			var impacta = preload("res://objects/impact.tscn")
+			var impact_instance = impacta.instantiate()
 			
 			impact_instance.play("shot")
 			

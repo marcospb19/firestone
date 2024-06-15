@@ -2,14 +2,14 @@ extends Node3D
 
 @export var player: Node3D
 
-@onready var raycast := $RayCast
-@onready var muzzle_a := $MuzzleA
-@onready var muzzle_b := $MuzzleB
-
 var health := 100
 var time := 0.0
 var target_position: Vector3
 var destroyed := false
+
+@onready var raycast := $RayCast
+@onready var muzzle_a := $MuzzleA
+@onready var muzzle_b := $MuzzleB
 
 
 func _ready():
