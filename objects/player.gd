@@ -20,8 +20,7 @@ signal health_updated
 var weapon: Weapon
 var weapon_index := 0
 var mouse_captured := true
-var mouse_input: Vector2
-var mouse_sensitivity := 500
+var mouse_sensitivity := 0.0008
 var gamepad_sensitivity := 0.075
 var movement_velocity: Vector3
 var rotation_target: Vector3
@@ -56,9 +55,6 @@ func _physics_process(delta):
 	velocity = applied_velocity
 	self.move_and_slide()
 	
-	# Rotation
-	camera.rotation.z = -mouse_input.x * 25 * delta
-	
 	camera.rotation.x = rotation_target.x
 	rotation.y = rotation_target.y
 	
@@ -86,10 +82,8 @@ func _physics_process(delta):
 
 func _input(event):
 	if event is InputEventMouseMotion and mouse_captured:
-		mouse_input = event.relative / mouse_sensitivity
-		
-		rotation_target.y -= event.relative.x / mouse_sensitivity
-		rotation_target.x -= event.relative.y / mouse_sensitivity
+		rotation_target.y -= event.relative.x * mouse_sensitivity
+		rotation_target.x -= event.relative.y * mouse_sensitivity
 
 func handle_controls(delta: float):
 	# Mouse capture
@@ -100,8 +94,6 @@ func handle_controls(delta: float):
 	if Input.is_action_just_pressed("mouse_capture_exit"):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		mouse_captured = false
-		
-		mouse_input = Vector2.ZERO
 	
 	# Movement
 	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
