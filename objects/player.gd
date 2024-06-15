@@ -17,18 +17,18 @@ signal health_updated
 @onready var sound_footsteps := $SoundFootsteps
 @onready var blaster_cooldown := $Cooldown
 
-var weapon: Weapon
 var weapon_index := 0
 var mouse_captured := true
 var mouse_sensitivity := 0.0008
 var gamepad_sensitivity := 0.075
-var movement_velocity: Vector3
-var rotation_target: Vector3
 var health := 100
 var gravity := 0.0
 var previously_floored := false
 var jump := true
 var container_offset := Vector3(1.2, -1.1, -2.75)
+var rotation_target: Vector3
+var movement_velocity: Vector3
+var weapon: Weapon
 var tween: Tween
 
 func _ready():
@@ -133,7 +133,7 @@ func action_shoot():
 		
 		container.position.z += 0.25 # Knockback of weapon visual
 		camera.rotation.x += 0.025 # Knockback of camera
-		movement_velocity += Vector3(0, 0, weapon.knockback) # Knockback
+		movement_velocity += Vector3.BACK * weapon.knockback # Knockback
 		
 		# Set muzzle flash position, play animation
 		muzzle.play("default")
