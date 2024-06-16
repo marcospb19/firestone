@@ -27,8 +27,8 @@ var tween: Tween
 
 @onready var camera := $Head/Camera
 @onready var raycast := $Head/Camera/RayCast
-@onready var muzzle := $Head/Camera/ViewportContainer/WeaponView/CameraItem/Muzzle
 @onready var weapon_container := $Head/Camera/ViewportContainer/WeaponView/CameraItem/WeaponContainer
+@onready var muzzle := $Head/Camera/ViewportContainer/WeaponView/CameraItem/WeaponContainer/Muzzle
 @onready var sound_footsteps := $SoundFootsteps
 @onready var blaster_cooldown := $Cooldown
 
@@ -132,17 +132,8 @@ func handle_action_shoot():
 		# Reset muzzle animation
 		muzzle.play()
 		muzzle.rotation_degrees.z = randf_range(0, 90)
-		muzzle.scale = Vector3.ONE * randf_range(0.40, 0.75)
-		# BUG: when the weapon sways on screen, muzzle effect doesn't follow
-		# this is incorrerent cause when played moves sideways it follows, and
-		# this it's not explained by acceleration changes, disrespecting inertia
-		# BUG update: I tried putting weapon inside of `weapon_container` but I
-		# couldn't see the muzzle anymore after it
-		# maybe the reason is this snippet in the other function
-		#	# Step 1. Remove previous weapon model(s) from weapon_container
-		#	for n in weapon_container.get_children():
-		#		weapon_container.remove_child(n)
-		muzzle.position = weapon_container.position - weapon.muzzle_position
+		muzzle.scale = Vector3.ONE * randf_range(0.35, 0.70)
+		muzzle.position = -weapon.muzzle_position
 		
 		raycast.force_raycast_update()
 		
@@ -190,17 +181,15 @@ func initiate_change_weapon(index):
 
 # Switches the weapon model (off-screen)
 func change_weapon():
-	weapon = weapons[weapon_index]
-	weapon_switched.emit(weapon)
-	
 	# Step 1. Remove previous weapon model(s) from weapon_container
-	for n in weapon_container.get_children():
-		weapon_container.remove_child(n)
+	self.get_tree().call_group("weapon_model", "queue_free")
 	
 	# Step 2. Place new weapon model in weapon_container
+	weapon = weapons[weapon_index]
+	weapon_switched.emit(weapon)
 	var weapon_model = weapon.model.instantiate()
 	weapon_container.add_child(weapon_model)
-	
+	weapon_model.add_to_group("weapon_model")
 	weapon_model.position = weapon.position
 	# Weapon assets are upside down for some reason so rotate em
 	weapon_model.rotation_degrees = Vector3(0, 180, 0)

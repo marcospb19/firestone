@@ -50,8 +50,8 @@ fov = 40.0
 [node name="WeaponContainer" type="Node3D" parent="Head/Camera/ViewportContainer/WeaponView/CameraItem"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, -1, -2.25)
 
-[node name="Muzzle" type="AnimatedSprite3D" parent="Head/Camera/ViewportContainer/WeaponView/CameraItem"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.297984, 0.91892, -6)
+[node name="Muzzle" type="AnimatedSprite3D" parent="Head/Camera/ViewportContainer/WeaponView/CameraItem/WeaponContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.902016, 1.91892, -3.75)
 layers = 2
 sprite_frames = ExtResource("4_m6ukc")
 frame = 2
