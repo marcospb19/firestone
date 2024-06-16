@@ -101,8 +101,8 @@ func _input(event):
 
 func handle_controls(delta: float):
 	handle_action_shoot()
-	handle_action_jet(delta)
 	handle_action_weapon_toggle()
+	handle_action_jump_and_jet(delta)
 	
 	# Mouse capture
 	if Input.is_action_just_pressed("mouse_capture"):
@@ -131,13 +131,14 @@ func handle_controls(delta: float):
 			gravity = -jump_strength
 			jump = false
 
-	if gravity > 0 and self.is_on_floor():
-		jump = true
-		gravity = 0
 
-
-func handle_action_jet(delta: float):
-	if Input.is_action_pressed("jetpack"):
+func handle_action_jump_and_jet(delta: float):
+	if self.is_on_floor():
+		gravity = 0.0
+	
+	if Input.is_action_pressed("jump"):
+		if self.is_on_floor():
+			gravity = -jump_strength
 		gravity -= jet_strength * delta
 
 
