@@ -79,7 +79,7 @@ func _physics_process(delta):
 	camera.position.y = lerp(camera.position.y, 0.0, delta * 5)
 	
 	if self.is_on_floor() and gravity > 1 and !previously_floored:  # Landed
-		Audio.play("sounds/land.ogg")
+		Audio.play("assets/sounds/land.ogg")
 		camera.position.y = -0.1
 	
 	previously_floored = self.is_on_floor()
@@ -124,7 +124,9 @@ func handle_controls(delta: float):
 	# Jumping
 	if Input.is_action_just_pressed("jump"):
 		if jump:
-			Audio.play(["sounds/jump_a.ogg", "sounds/jump_b.ogg", "sounds/jump_c.ogg"])
+			Audio.play(
+				["assets/sounds/jump_a.ogg", "assets/sounds/jump_b.ogg", "assets/sounds/jump_c.ogg"]
+			)
 			gravity = -jump_strength
 			jump = false
 
@@ -187,7 +189,7 @@ func handle_action_weapon_toggle():
 		weapon_index = wrap(weapon_index + 1, 0, weapons.size())
 		initiate_change_weapon(weapon_index)
 		
-		Audio.play("sounds/weapon_change.ogg")
+		Audio.play("assets/sounds/weapon_change.ogg")
 
 
 # Initiates the weapon changing animation (tween)
