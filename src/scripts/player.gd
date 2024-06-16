@@ -139,7 +139,7 @@ func handle_action_jump_and_jet(delta: float):
 	
 	if Input.is_action_pressed("jump"):
 		if self.is_on_floor():
-			gravity = -jump_strength
+			gravity = min(-jump_strength, gravity - jump_strength / 2)
 		gravity -= jet_strength * delta
 
 
