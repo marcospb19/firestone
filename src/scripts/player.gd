@@ -46,7 +46,7 @@ func apply_rotation(diff: Vector2):
 	# Horizontal rotation
 	rotation.y -= diff.x
 	# Vertical rotation
-	camera.rotation.x -= diff.y
+	camera.rotation.x = clampf(camera.rotation.x - diff.y, deg_to_rad(-90.0), deg_to_rad(90.0))
 
 
 func _physics_process(delta):
