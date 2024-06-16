@@ -139,7 +139,7 @@ func handle_action_jump_and_jet(delta: float):
 	
 	if Input.is_action_pressed("jump"):
 		if self.is_on_floor():
-			gravity = min(-jump_strength, gravity - jump_strength / 2)
+			gravity = min(-jump_strength, gravity - jump_strength / 2.0)
 		gravity -= jet_strength * delta
 
 
@@ -150,14 +150,15 @@ func handle_action_shoot():
 		
 		# Reset muzzle animation
 		muzzle.play()
-		muzzle.rotation_degrees.z = randf_range(-45, 45)
+		muzzle.rotation_degrees.z = randf_range(0, 90)
 		muzzle.scale = Vector3.ONE * randf_range(0.40, 0.75)
 		# BUG: when the weapon sways on screen, muzzle effect doesn't follow
 		# this is incorrerent cause when played moves sideways it follows, and
 		# this it's not explained by acceleration changes, disrespecting inertia
+		# BUG update: I tried putting weapon inside of `container` but I
+		# couldn't see the muzzle anymore after it, F?
 		muzzle.position = container.position - weapon.muzzle_position
 		
-
 		# BUG: I can hit enemies through walls
 		raycast.force_raycast_update()
 		
@@ -220,7 +221,7 @@ func change_weapon():
 	# Step 3. Set model to only render on layer 2 (the weapon camera)
 	for child in weapon_model.find_children("*", "MeshInstance3D"):
 		child.layers = 2
-		
+	
 	# Set weapon data
 	raycast.target_position = Vector3(0, 0, -10000000)
 	crosshair.texture = weapon.crosshair
