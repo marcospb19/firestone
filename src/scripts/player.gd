@@ -1,3 +1,4 @@
+# TODO: add bullet tracers
 # TODO: fix particles offset when hitting angled surfaces
 # TODO: remove camera lerp curves, wait, what do they do really?
 # TODO: re-add weapon model kickback
