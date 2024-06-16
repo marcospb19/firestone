@@ -13,7 +13,6 @@ extends Resource
 @export_range(0, 100) var damage: float  # Damage per hit
 @export_range(0, 5) var spread: float = 0  # Spread of each shot
 @export_range(1, 5) var shot_count: int = 1  # Amount of shots
-@export_range(0, 50) var knockback: int  # Amount of knockback
 @export_subgroup("Sounds")
 @export var sound_shoot: String  # Sound path
 @export_subgroup("Crosshair")

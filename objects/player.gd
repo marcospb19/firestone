@@ -142,10 +142,6 @@ func handle_action_shoot():
 	if Input.is_action_pressed("shoot") and blaster_cooldown.is_stopped():
 		Audio.play(weapon.sound_shoot)
 		
-		container.position.z += 0.25  # Knockback of weapon visual
-		camera.rotation.x += 0.025  # Knockback of camera
-		movement_velocity += Vector3.BACK * weapon.knockback  # Knockback
-		
 		# Set muzzle flash position, play animation
 		muzzle.play("default")
 		
@@ -230,6 +226,5 @@ func change_weapon():
 func damage(amount):
 	health -= amount
 	health_updated.emit(health)  # Update health on HUD
-	
 	if health < 0:
-		get_tree().reload_current_scene()  # Reset when out of health
+		get_tree().reload_current_scene()  # Reset game when out of health
