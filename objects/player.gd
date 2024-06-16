@@ -1,3 +1,6 @@
+# BUG: weapon sway when moving on floor goes into weird directions
+# TODO: remove camera lerp curves
+
 extends CharacterBody3D
 
 signal health_updated
@@ -142,11 +145,13 @@ func handle_action_shoot():
 	if Input.is_action_pressed("shoot") and blaster_cooldown.is_stopped():
 		Audio.play(weapon.sound_shoot)
 		
-		# Set muzzle flash position, play animation
-		muzzle.play("default")
-		
+		# Reset muzzle animation
+		muzzle.play()
 		muzzle.rotation_degrees.z = randf_range(-45, 45)
 		muzzle.scale = Vector3.ONE * randf_range(0.40, 0.75)
+		# BUG: when the weapon sways on screen, muzzle effect doesn't follow
+		# this is incorrerent cause when played moves sideways it follows, and
+		# this it's not explained by acceleration changes, disrespecting inertia
 		muzzle.position = container.position - weapon.muzzle_position
 		
 		blaster_cooldown.start(weapon.cooldown)
@@ -156,6 +161,7 @@ func handle_action_shoot():
 			raycast.target_position.x = randf_range(-weapon.spread, weapon.spread)
 			raycast.target_position.y = randf_range(-weapon.spread, weapon.spread)
 			
+			# BUG: I can hit enemies through walls
 			raycast.force_raycast_update()
 			
 			if !raycast.is_colliding():

@@ -8,9 +8,9 @@ var next_player_index := 0
 func _ready():
 	for i in AUDIO_PLAYER_COUNT:
 		var player = AudioStreamPlayer.new()
-		self.add_child(player)
+		player.volume_db = -25
 		players.append(player)
-		player.volume_db = -30
+		self.add_child(player)
 
 
 ## path: String | Array[String]
