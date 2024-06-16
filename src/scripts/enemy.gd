@@ -2,7 +2,7 @@ extends Node3D
 
 @export var player: Node3D
 
-var health := 100
+var health := 1000
 var time := 0.0
 var destroyed := false
 

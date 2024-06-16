@@ -145,7 +145,8 @@ func handle_action_jump_and_jet(delta: float):
 
 func handle_action_shoot():
 	if Input.is_action_pressed("shoot") and blaster_cooldown.is_stopped():
-		Audio.play(weapon.sound_shoot)
+		blaster_cooldown.start(weapon.cooldown)
+		Audio.play(weapon.sound_shoot, weapon.volume_db)
 		
 		# Reset muzzle animation
 		muzzle.play()
@@ -156,16 +157,12 @@ func handle_action_shoot():
 		# this it's not explained by acceleration changes, disrespecting inertia
 		muzzle.position = container.position - weapon.muzzle_position
 		
-		blaster_cooldown.start(weapon.cooldown)
+
+		# BUG: I can hit enemies through walls
+		raycast.force_raycast_update()
 		
-		# Shoot the weapon, amount based on shot count
-		for n in weapon.shot_count:
-			# BUG: I can hit enemies through walls
-			raycast.force_raycast_update()
-			
-			if !raycast.is_colliding():
-				continue  # Don't create impact when raycast didn't hit
-			
+		# hitreg
+		if raycast.is_colliding():
 			var collider = raycast.get_collider()
 			
 			# Hitting an enemy
@@ -173,6 +170,7 @@ func handle_action_shoot():
 				collider.damage(weapon.damage)
 			
 			# Creating an impact animation
+			# BUG: impact is almost always a bit off-target
 			var impact = preload("res://src/scenes/impact.tscn")
 			var impact_instance = impact.instantiate()
 			impact_instance.play("shot")
@@ -180,7 +178,7 @@ func handle_action_shoot():
 			self.get_tree().root.add_child(impact_instance)
 			
 			impact_instance.position = (
-				raycast.get_collision_point() + (raycast.get_collision_normal() / 10)
+				raycast.get_collision_point() + raycast.get_collision_normal() / 10
 			)
 			impact_instance.look_at(camera.global_transform.origin, Vector3.UP, true)
 
@@ -216,7 +214,8 @@ func change_weapon():
 	container.add_child(weapon_model)
 	
 	weapon_model.position = weapon.position
-	weapon_model.rotation_degrees = weapon.rotation
+	# Weapon assets are upside down for some reason so rotate em
+	weapon_model.rotation_degrees = Vector3(0, 180, 0)
 	
 	# Step 3. Set model to only render on layer 2 (the weapon camera)
 	for child in weapon_model.find_children("*", "MeshInstance3D"):
