@@ -173,7 +173,7 @@ func handle_action_shoot():
 				collider.damage(weapon.damage)
 			
 			# Creating an impact animation
-			var impact = preload("res://src/objects/impact.tscn")
+			var impact = preload("res://src/scenes/impact.tscn")
 			var impact_instance = impact.instantiate()
 			impact_instance.play("shot")
 			
