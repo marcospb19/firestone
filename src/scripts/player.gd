@@ -15,8 +15,6 @@ signal weapon_switched
 @export var weapons: Array[Weapon] = []
 
 var weapon_index := 0
-# TASK: put this in a singleton
-var mouse_captured := true
 var mouse_sensitivity := 0.0008
 var gamepad_sensitivity := 0.075
 var health := 100
@@ -83,7 +81,7 @@ func _physics_process(delta):
 
 func _input(event):
 	# Mouse look control
-	if event is InputEventMouseMotion and mouse_captured:
+	if event is InputEventMouseMotion and InputExt.is_mouse_captured():
 		var mouse_rotation = event.relative * mouse_sensitivity
 		apply_rotation(mouse_rotation)
 
@@ -92,15 +90,6 @@ func handle_controls(delta: float):
 	handle_action_shoot()
 	handle_action_weapon_toggle()
 	handle_action_jump_and_jet(delta)
-	
-	# Mouse capture
-	if Input.is_action_just_pressed("mouse_capture"):
-		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-		mouse_captured = true
-	
-	if Input.is_action_just_pressed("mouse_capture_exit"):
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		mouse_captured = false
 	
 	# Movement
 	var input = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
@@ -126,7 +115,6 @@ func handle_controls(delta: float):
 
 
 func handle_action_jump_and_jet(delta: float):
-	# BUG: velocity still accumulates for ceiling collisions, this only checks floors
 	if self.is_on_floor():
 		velocity.y = 0.0
 	

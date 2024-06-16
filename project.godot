@@ -26,6 +26,7 @@ driver/output_latency=10
 [autoload]
 
 Audio="*res://src/singletons/audio.gd"
+InputExt="*res://src/singletons/input_ext.gd"
 
 [debug]
 
