@@ -1,5 +1,5 @@
 # BUG: weapon sway when moving on floor goes into weird directions
-# TODO: remove camera lerp curves
+# TODO: remove camera lerp curves, wait, what do they do really?
 # TODO: re-add weapon model kickback
 
 extends CharacterBody3D
@@ -31,8 +31,8 @@ var tween: Tween
 
 @onready var camera := $Head/Camera
 @onready var raycast := $Head/Camera/RayCast
-@onready var muzzle := $Head/Camera/SubViewportContainer/SubViewport/CameraItem/Muzzle
-@onready var container := $Head/Camera/SubViewportContainer/SubViewport/CameraItem/Container
+@onready var muzzle := $Head/Camera/WeaponViewportContainer/WeaponSubViewport/CameraItem/Muzzle
+@onready var container := $Head/Camera/WeaponViewportContainer/WeaponSubViewport/CameraItem/WeaponContainer
 @onready var sound_footsteps := $SoundFootsteps
 @onready var blaster_cooldown := $Cooldown
 
