@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="Weapon" load_steps=5 format=3 uid="uid://cu2gtxlcmbb34"]
 
-[ext_resource type="Script" path="res://scripts/weapon.gd" id="1_l1atd"]
+[ext_resource type="Script" path="res://src/scripts/weapon.gd" id="1_l1atd"]
 [ext_resource type="Texture2D" uid="uid://ce3lgq7foiusl" path="res://assets/sprites/crosshair-repeater.png" id="1_rhdjb"]
 [ext_resource type="PackedScene" uid="uid://dd3oln1ucgqpd" path="res://assets/models/blaster-repeater.glb" id="2_bvn0m"]
 [ext_resource type="AudioStream" uid="uid://csdsvg0nh35id" path="res://assets/sounds/blaster_repeater.ogg" id="4_pa5qs"]
