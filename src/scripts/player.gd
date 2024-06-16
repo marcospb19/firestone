@@ -17,11 +17,9 @@ signal weapon_switched
 var weapon_index := 0
 # TASK: put this in a singleton
 var mouse_captured := true
-var mouse_sensitivity := 0.00082
+var mouse_sensitivity := 0.0008
 var gamepad_sensitivity := 0.075
 var health := 100
-# TODO: remove this, self.velocity is enough
-var gravity := 0.0
 var previously_floored := false
 var jump := true
 var container_offset := Vector3(1.2, -1.1, -2.75)
@@ -31,8 +29,8 @@ var tween: Tween
 
 @onready var camera := $Head/Camera
 @onready var raycast := $Head/Camera/RayCast
-@onready var muzzle := $Head/Camera/WeaponViewportContainer/WeaponSubViewport/CameraItem/Muzzle
-@onready var container := $Head/Camera/WeaponViewportContainer/WeaponSubViewport/CameraItem/WeaponContainer
+@onready var muzzle := $Head/Camera/ViewportContainer/WeaponSubViewport/CameraItem/Muzzle
+@onready var container := $Head/Camera/ViewportContainer/WeaponSubViewport/CameraItem/WeaponContainer
 @onready var sound_footsteps := $SoundFootsteps
 @onready var blaster_cooldown := $Cooldown
 
@@ -52,25 +50,13 @@ func apply_rotation(diff: Vector2):
 
 
 func _physics_process(delta):
+	# apply gravity
+	velocity.y -= 20 * delta
+	
 	# Handle functions
 	handle_controls(delta)
 	
-	# apply gravity
-	gravity += 20 * delta
-	
-	# Movement
-	var applied_velocity: Vector3
-	movement_velocity = transform.basis * movement_velocity  # Move forward
-	
-	applied_velocity = velocity.lerp(movement_velocity, delta * 10)
-	applied_velocity.y = -gravity
-	
-	velocity = applied_velocity
-	self.move_and_slide()
-	
-	container.position = lerp(
-		container.position, container_offset - (applied_velocity / 30), delta * 10
-	)
+	container.position = lerp(container.position, container_offset - (velocity / 30), delta * 10)
 	
 	# Movement sound
 	sound_footsteps.stream_paused = true
@@ -82,7 +68,7 @@ func _physics_process(delta):
 	#Landing after jump or falling
 	camera.position.y = lerp(camera.position.y, 0.0, delta * 5)
 	
-	if self.is_on_floor() and gravity > 1 and !previously_floored:  # Landed
+	if self.is_on_floor() and velocity.y > 1 and !previously_floored:  # Landed
 		Audio.play_at("land.ogg")
 		camera.position.y = -0.1
 	
@@ -115,8 +101,12 @@ func handle_controls(delta: float):
 		mouse_captured = false
 	
 	# Movement
-	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	movement_velocity = Vector3(input.x, 0, input.y).normalized() * movement_speed
+	var input = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+	var movement = Vector3(input.x, 0, input.y).limit_length(1.0) * movement_speed
+	movement.y = velocity.y
+	velocity = transform.basis * movement
+	
+	self.move_and_slide()
 	
 	# Gamepad look control
 	var gamepad_rotation_input := Input.get_vector(
@@ -129,19 +119,19 @@ func handle_controls(delta: float):
 	if Input.is_action_just_pressed("jump"):
 		if jump:
 			Audio.play_at(["jump_a.ogg", "jump_b.ogg", "jump_c.ogg"])
-			gravity = -jump_strength
+			velocity.y = -jump_strength
 			jump = false
 
 
 func handle_action_jump_and_jet(delta: float):
 	# BUG: velocity still accumulates for ceiling collisions, this only checks floors
 	if self.is_on_floor():
-		gravity = 0.0
+		velocity.y = 0.0
 	
 	if Input.is_action_pressed("jump"):
 		if self.is_on_floor():
-			gravity = min(-jump_strength, gravity - jump_strength / 2.0)
-		gravity -= jet_strength * delta
+			velocity.y = max(jump_strength, velocity.y + jump_strength / 2.0)
+		velocity.y += jet_strength * delta
 
 
 func handle_action_shoot():

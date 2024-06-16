@@ -28,7 +28,7 @@ cull_mask = 1048573
 current = true
 fov = 80.0
 
-[node name="WeaponViewportContainer" type="SubViewportContainer" parent="Head/Camera"]
+[node name="ViewportContainer" type="SubViewportContainer" parent="Head/Camera"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -36,21 +36,21 @@ grow_horizontal = 2
 grow_vertical = 2
 stretch = true
 
-[node name="WeaponSubViewport" type="SubViewport" parent="Head/Camera/WeaponViewportContainer"]
+[node name="WeaponSubViewport" type="SubViewport" parent="Head/Camera/ViewportContainer"]
 transparent_bg = true
 handle_input_locally = false
 msaa_3d = 1
 size = Vector2i(1280, 720)
 render_target_update_mode = 4
 
-[node name="CameraItem" type="Camera3D" parent="Head/Camera/WeaponViewportContainer/WeaponSubViewport"]
+[node name="CameraItem" type="Camera3D" parent="Head/Camera/ViewportContainer/WeaponSubViewport"]
 cull_mask = 1047554
 fov = 40.0
 
-[node name="WeaponContainer" type="Node3D" parent="Head/Camera/WeaponViewportContainer/WeaponSubViewport/CameraItem"]
+[node name="WeaponContainer" type="Node3D" parent="Head/Camera/ViewportContainer/WeaponSubViewport/CameraItem"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, -1, -2.25)
 
-[node name="Muzzle" type="AnimatedSprite3D" parent="Head/Camera/WeaponViewportContainer/WeaponSubViewport/CameraItem"]
+[node name="Muzzle" type="AnimatedSprite3D" parent="Head/Camera/ViewportContainer/WeaponSubViewport/CameraItem"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.297984, 0.91892, -6)
 layers = 2
 sprite_frames = ExtResource("4_m6ukc")
