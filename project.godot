@@ -19,6 +19,10 @@ boot_splash/bg_color=Color(0.92549, 0.92549, 0.960784, 1)
 boot_splash/image="res://splash-screen.png"
 config/icon="res://icon.png"
 
+[audio]
+
+driver/output_latency=10
+
 [autoload]
 
 Audio="*res://scripts/audio.gd"

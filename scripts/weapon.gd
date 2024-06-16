@@ -13,6 +13,6 @@ extends Resource
 @export_range(0, 5) var spread: float = 0  # Spread of each shot # TODO: fix spread but with angles
 @export_range(1, 5) var shot_count: int = 1  # Amount of shots
 @export_subgroup("Sounds")
-@export var sound_shoot: String  # Sound path
+@export var sound_shoot: Resource  # Sound resource
 @export_subgroup("Crosshair")
 @export var crosshair: Texture2D  # Image of crosshair on-screen
