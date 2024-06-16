@@ -12,14 +12,13 @@ signal health_updated
 
 var weapon_index := 0
 var mouse_captured := true
-var mouse_sensitivity := 0.0008
+var mouse_sensitivity := 0.001
 var gamepad_sensitivity := 0.075
 var health := 100
 var gravity := 0.0
 var previously_floored := false
 var jump := true
 var container_offset := Vector3(1.2, -1.1, -2.75)
-var rotation_target: Vector3
 var movement_velocity: Vector3
 var weapon: Weapon
 var tween: Tween
@@ -39,6 +38,14 @@ func _ready():
 	initiate_change_weapon(weapon_index)
 
 
+# Rotates player look, input is X and Y diff
+func apply_rotation(diff: Vector2):
+	# Horizontal movement
+	rotation.y -= diff.x
+	# Vertical movement
+	camera.rotation.x -= diff.y
+
+
 func _physics_process(delta):
 	# Handle functions
 	handle_controls(delta)
@@ -56,9 +63,6 @@ func _physics_process(delta):
 	
 	velocity = applied_velocity
 	self.move_and_slide()
-	
-	camera.rotation.x = rotation_target.x
-	rotation.y = rotation_target.y
 	
 	container.position = lerp(
 		container.position, container_offset - (applied_velocity / 30), delta * 10
@@ -86,12 +90,17 @@ func _physics_process(delta):
 
 
 func _input(event):
+	# Mouse look control
 	if event is InputEventMouseMotion and mouse_captured:
-		rotation_target.y -= event.relative.x * mouse_sensitivity
-		rotation_target.x -= event.relative.y * mouse_sensitivity
+		var mouse_rotation = event.relative * mouse_sensitivity
+		apply_rotation(mouse_rotation)
 
 
 func handle_controls(delta: float):
+	handle_action_shoot()
+	handle_action_jet(delta)
+	handle_action_weapon_toggle()
+	
 	# Mouse capture
 	if Input.is_action_just_pressed("mouse_capture"):
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -103,21 +112,14 @@ func handle_controls(delta: float):
 	
 	# Movement
 	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	
 	movement_velocity = Vector3(input.x, 0, input.y).normalized() * movement_speed
 	
-	# Rotation
-	var rotation_input := Input.get_vector(
-		"camera_right", "camera_left", "camera_down", "camera_up"
+	# Gamepad look control
+	var gamepad_rotation_input := Input.get_vector(
+		"look_right", "look_left", "look_down", "look_up"
 	)
-	
-	rotation_target -= (
-		Vector3(-rotation_input.y, -rotation_input.x, 0).limit_length(1.0) * gamepad_sensitivity
-	)
-	rotation_target.x = clamp(rotation_target.x, deg_to_rad(-90), deg_to_rad(90))
-	
-	action_shoot()
-	action_jet(delta)
+	var gamepad_rotation = gamepad_rotation_input.limit_length(1.0) * gamepad_sensitivity
+	apply_rotation(gamepad_rotation)
 	
 	# Jumping
 	if Input.is_action_just_pressed("jump"):
@@ -129,17 +131,14 @@ func handle_controls(delta: float):
 	if gravity > 0 and self.is_on_floor():
 		jump = true
 		gravity = 0
-		
-	# Weapon switching
-	action_weapon_toggle()
 
 
-func action_jet(delta: float):
+func handle_action_jet(delta: float):
 	if Input.is_action_pressed("jetpack"):
 		gravity -= jet_strength * delta
 
 
-func action_shoot():
+func handle_action_shoot():
 	if Input.is_action_pressed("shoot") and blaster_cooldown.is_stopped():
 		Audio.play(weapon.sound_shoot)
 		
@@ -187,7 +186,7 @@ func action_shoot():
 
 
 # Toggle between available weapons (listed in 'weapons')
-func action_weapon_toggle():
+func handle_action_weapon_toggle():
 	if Input.is_action_just_pressed("weapon_toggle"):
 		weapon_index = wrap(weapon_index + 1, 0, weapons.size())
 		initiate_change_weapon(weapon_index)
