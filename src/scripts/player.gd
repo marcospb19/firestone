@@ -1,9 +1,11 @@
 # BUG: weapon sway when moving on floor goes into weird directions
 # TODO: remove camera lerp curves
+# TODO: re-add weapon model kickback
 
 extends CharacterBody3D
 
 signal health_updated
+signal weapon_switched
 
 @export_subgroup("Properties")
 @export var movement_speed = 5
@@ -11,7 +13,6 @@ signal health_updated
 @export var jet_strength = 23
 @export_subgroup("Weapons")
 @export var weapons: Array[Weapon] = []
-@export var crosshair: TextureRect
 
 var weapon_index := 0
 # TASK: put this in a singleton
@@ -156,7 +157,11 @@ func handle_action_shoot():
 		# this is incorrerent cause when played moves sideways it follows, and
 		# this it's not explained by acceleration changes, disrespecting inertia
 		# BUG update: I tried putting weapon inside of `container` but I
-		# couldn't see the muzzle anymore after it, F?
+		# couldn't see the muzzle anymore after it
+		# maybe the reason is this snippet in the other function
+		#	# Step 1. Remove previous weapon model(s) from container
+		#	for n in container.get_children():
+		#		container.remove_child(n)
 		muzzle.position = container.position - weapon.muzzle_position
 		
 		# BUG: I can hit enemies through walls
@@ -205,6 +210,7 @@ func initiate_change_weapon(index):
 # Switches the weapon model (off-screen)
 func change_weapon():
 	weapon = weapons[weapon_index]
+	weapon_switched.emit(weapon)
 	
 	# Step 1. Remove previous weapon model(s) from container
 	for n in container.get_children():
@@ -223,8 +229,7 @@ func change_weapon():
 		child.layers = 2
 	
 	# Set weapon data
-	raycast.target_position = Vector3(0, 0, -10000000)
-	crosshair.texture = weapon.crosshair
+	raycast.target_position = Vector3(0, 0, -10000)
 
 
 func damage(amount):
