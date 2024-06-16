@@ -1,11 +1,14 @@
-# BUG: weapon sway when moving on floor goes into weird directions
+# TODO: fix particles offset when hitting angled surfaces
 # TODO: remove camera lerp curves, wait, what do they do really?
 # TODO: re-add weapon model kickback
+# TODO: make camera sway respect inertia, it should move on acceleration and not
+# velocity
 
 extends CharacterBody3D
 
-signal health_updated
-signal weapon_switched
+signal health_updated(int)
+signal weapon_switched(Weapon)
+signal hit_enemy(bool)
 
 @export_subgroup("Properties")
 @export var movement_speed = 5
@@ -23,7 +26,6 @@ var jump := true
 var weapon_container_offset := Vector3(1.2, -1.1, -2.75)
 var movement_velocity: Vector3
 var weapon: Weapon
-var tween: Tween
 
 @onready var camera := $Head/Camera
 @onready var raycast := $Head/Camera/RayCast
@@ -41,9 +43,9 @@ func _ready():
 
 # Rotates player look, input is X and Y diff
 func apply_rotation(diff: Vector2):
-	# Horizontal movement
+	# Horizontal rotation
 	rotation.y -= diff.x
-	# Vertical movement
+	# Vertical rotation
 	camera.rotation.x -= diff.y
 
 
@@ -143,14 +145,17 @@ func handle_action_shoot():
 			
 			# Hitting an enemy
 			if collider.has_method("damage"):
-				collider.damage(weapon.damage)
+				var killed = collider.damage(weapon.damage)
+				hit_enemy.emit(killed)
 			
 			# Creating an impact animation
-			# BUG: impact is almost always a bit off-target
 			var impact = preload("res://src/scenes/impact.tscn")
 			var impact_instance = impact.instantiate()
 			impact_instance.play("shot")
 			
+			# TODO: add singleton World for a method to add effects like this
+			# to the world into a specific node, instead of polluting the tree
+			# root
 			self.get_tree().root.add_child(impact_instance)
 			
 			impact_instance.position = (
@@ -171,8 +176,7 @@ func handle_action_weapon_toggle():
 # Initiates the weapon changing animation (tween)
 func initiate_change_weapon(index):
 	weapon_index = index
-	tween = get_tree().create_tween()
-	tween.set_ease(Tween.EASE_OUT_IN)
+	var tween = self.create_tween()
 	tween.tween_property(
 		weapon_container, "position", weapon_container_offset - Vector3(0, 1, 0), 0.1
 	)
@@ -202,7 +206,7 @@ func change_weapon():
 	raycast.target_position = Vector3(0, 0, -10000)
 
 
-func damage(amount):
+func damage(amount: int):
 	health -= amount
 	health_updated.emit(health)  # Update health on HUD
 	if health < 0:

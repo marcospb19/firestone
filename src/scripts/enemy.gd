@@ -2,9 +2,10 @@ extends Node3D
 
 @export var player: Node3D
 
-var health := 1000
+var health := 100
 var time := 0.0
-var destroyed := false
+# TASK: use naming conventions for all bools in project
+var already_dead := false
 
 @onready var raycast := $RayCast
 @onready var muzzle_a := $MuzzleA
@@ -18,14 +19,18 @@ func _process(delta):
 
 
 # Take damage from player
-func damage(amount):
+## Return value: did this damage kill?
+func damage(amount: int) -> bool:
 	Audio.play_at("enemy_hurt.ogg")
 	health -= amount
 	
-	if health <= 0 and !destroyed:
-		Audio.play_at("enemy_destroy.ogg")
-		destroyed = true
-		self.queue_free()
+	if health > 0 or already_dead:
+		return false
+	
+	Audio.play_at("enemy_destroy.ogg")
+	already_dead = true
+	self.queue_free()
+	return true
 
 
 # Shoot when timer hits 0
