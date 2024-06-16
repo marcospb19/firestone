@@ -22,15 +22,15 @@ var gamepad_sensitivity := 0.075
 var health := 100
 var previously_floored := false
 var jump := true
-var container_offset := Vector3(1.2, -1.1, -2.75)
+var weapon_container_offset := Vector3(1.2, -1.1, -2.75)
 var movement_velocity: Vector3
 var weapon: Weapon
 var tween: Tween
 
 @onready var camera := $Head/Camera
 @onready var raycast := $Head/Camera/RayCast
-@onready var muzzle := $Head/Camera/ViewportContainer/WeaponSubViewport/CameraItem/Muzzle
-@onready var container := $Head/Camera/ViewportContainer/WeaponSubViewport/CameraItem/WeaponContainer
+@onready var muzzle := $Head/Camera/ViewportContainer/WeaponView/CameraItem/Muzzle
+@onready var weapon_container := $Head/Camera/ViewportContainer/WeaponView/CameraItem/WeaponContainer
 @onready var sound_footsteps := $SoundFootsteps
 @onready var blaster_cooldown := $Cooldown
 
@@ -56,7 +56,9 @@ func _physics_process(delta):
 	# Handle functions
 	handle_controls(delta)
 	
-	container.position = lerp(container.position, container_offset - (velocity / 30), delta * 10)
+	weapon_container.position = lerp(
+		weapon_container.position, weapon_container_offset - (velocity / 30), delta * 10
+	)
 	
 	# Movement sound
 	sound_footsteps.stream_paused = true
@@ -146,15 +148,14 @@ func handle_action_shoot():
 		# BUG: when the weapon sways on screen, muzzle effect doesn't follow
 		# this is incorrerent cause when played moves sideways it follows, and
 		# this it's not explained by acceleration changes, disrespecting inertia
-		# BUG update: I tried putting weapon inside of `container` but I
+		# BUG update: I tried putting weapon inside of `weapon_container` but I
 		# couldn't see the muzzle anymore after it
 		# maybe the reason is this snippet in the other function
-		#	# Step 1. Remove previous weapon model(s) from container
-		#	for n in container.get_children():
-		#		container.remove_child(n)
-		muzzle.position = container.position - weapon.muzzle_position
+		#	# Step 1. Remove previous weapon model(s) from weapon_container
+		#	for n in weapon_container.get_children():
+		#		weapon_container.remove_child(n)
+		muzzle.position = weapon_container.position - weapon.muzzle_position
 		
-		# BUG: I can hit enemies through walls
 		raycast.force_raycast_update()
 		
 		# hitreg
@@ -193,7 +194,9 @@ func initiate_change_weapon(index):
 	weapon_index = index
 	tween = get_tree().create_tween()
 	tween.set_ease(Tween.EASE_OUT_IN)
-	tween.tween_property(container, "position", container_offset - Vector3(0, 1, 0), 0.1)
+	tween.tween_property(
+		weapon_container, "position", weapon_container_offset - Vector3(0, 1, 0), 0.1
+	)
 	tween.tween_callback(change_weapon)  # Changes the model
 
 
@@ -202,13 +205,13 @@ func change_weapon():
 	weapon = weapons[weapon_index]
 	weapon_switched.emit(weapon)
 	
-	# Step 1. Remove previous weapon model(s) from container
-	for n in container.get_children():
-		container.remove_child(n)
+	# Step 1. Remove previous weapon model(s) from weapon_container
+	for n in weapon_container.get_children():
+		weapon_container.remove_child(n)
 	
-	# Step 2. Place new weapon model in container
+	# Step 2. Place new weapon model in weapon_container
 	var weapon_model = weapon.model.instantiate()
-	container.add_child(weapon_model)
+	weapon_container.add_child(weapon_model)
 	
 	weapon_model.position = weapon.position
 	# Weapon assets are upside down for some reason so rotate em
