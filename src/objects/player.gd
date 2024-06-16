@@ -14,10 +14,12 @@ signal health_updated
 @export var crosshair: TextureRect
 
 var weapon_index := 0
+# TASK: put this in a singleton
 var mouse_captured := true
-var mouse_sensitivity := 0.001
+var mouse_sensitivity := 0.00082
 var gamepad_sensitivity := 0.075
 var health := 100
+# TODO: remove this, self.velocity is enough
 var gravity := 0.0
 var previously_floored := false
 var jump := true
@@ -36,7 +38,6 @@ var tween: Tween
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	
 	weapon = weapons[weapon_index]  # Weapon must never be null
 	initiate_change_weapon(weapon_index)
 
@@ -58,7 +59,6 @@ func _physics_process(delta):
 	
 	# Movement
 	var applied_velocity: Vector3
-	
 	movement_velocity = transform.basis * movement_velocity  # Move forward
 	
 	applied_velocity = velocity.lerp(movement_velocity, delta * 10)
@@ -133,6 +133,7 @@ func handle_controls(delta: float):
 
 
 func handle_action_jump_and_jet(delta: float):
+	# BUG: velocity still accumulates for ceiling collisions, this only checks floors
 	if self.is_on_floor():
 		gravity = 0.0
 	
@@ -159,9 +160,6 @@ func handle_action_shoot():
 		
 		# Shoot the weapon, amount based on shot count
 		for n in weapon.shot_count:
-			raycast.target_position.x = randf_range(-weapon.spread, weapon.spread)
-			raycast.target_position.y = randf_range(-weapon.spread, weapon.spread)
-			
 			# BUG: I can hit enemies through walls
 			raycast.force_raycast_update()
 			

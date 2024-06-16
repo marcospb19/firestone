@@ -10,7 +10,6 @@ extends Resource
 @export_subgroup("Properties")
 @export_range(0.1, 1) var cooldown: float = 0.1  # Firerate
 @export_range(0, 100) var damage: float  # Damage per hit
-@export_range(0, 5) var spread: float = 0  # Spread of each shot # TODO: fix spread, use angles
 @export_range(1, 5) var shot_count: int = 1  # Amount of shots
 @export_subgroup("Sounds")
 @export var sound_shoot: Resource  # Sound resource
