@@ -2,7 +2,7 @@ extends Node3D
 
 @export var player: Node3D
 
-var health := 100
+var health := 100.0
 var time := 0.0
 # TASK: use naming conventions for all bools in project
 var already_dead := false

@@ -14,17 +14,17 @@ func _on_player_weapon_switched(weapon: Weapon):
 
 
 func _on_player_hit_enemy(killed: bool):
-	var ss = hitmarker_tween_settings(killed)
+	var s = hitmarker_tween_settings(killed)
 	
-	hitmarker.texture = ss.texture
-	hitmarker.scale = Vector2.ONE * ss.marker_scale
+	hitmarker.texture = s.texture
+	hitmarker.scale = Vector2.ONE * s.marker_scale
 	
 	var tween = self.create_tween().set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
-	tween.tween_method(hitmarker.set_modulate, ss.from, ss.to, ss.duration)
+	tween.tween_method(hitmarker.set_modulate, s.from, s.to, s.duration)
 	
-	if ss.hold_black_effect:
+	if s.hold_black_effect:
 		tween.chain().tween_method(
-			hitmarker.set_modulate, ss.to, Color.BLACK * Color.TRANSPARENT, 0.5
+			hitmarker.set_modulate, s.to, Color.BLACK * Color.TRANSPARENT, 0.5
 		)
 
 

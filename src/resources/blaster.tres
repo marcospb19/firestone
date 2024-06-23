@@ -2,17 +2,17 @@
 
 [ext_resource type="Texture2D" uid="uid://2jld33y6h5pq" path="res://assets/sprites/crosshair.png" id="1_8e4lk"]
 [ext_resource type="PackedScene" uid="uid://b2p7bbkuxf7m" path="res://assets/models/blaster.glb" id="2_ytn7n"]
-[ext_resource type="Script" path="res://src/scripts/weapon.gd" id="3_iphlx"]
+[ext_resource type="Script" path="res://src/scripts/resource-scripts/weapon.gd" id="3_5rs1c"]
 [ext_resource type="AudioStream" uid="uid://dkftljsbdhwng" path="res://assets/sounds/blaster.ogg" id="4_ikmkb"]
 
 [resource]
-script = ExtResource("3_iphlx")
+script = ExtResource("3_5rs1c")
 model = ExtResource("2_ytn7n")
 position = Vector3(0, 0, 0)
 rotation = Vector3(0, 0, 0)
 muzzle_position = Vector3(0.1, -0.4, 1.5)
-cooldown = 0.01
-damage = 2.5
+rpm = 50.0
+damage = 40.0
 sound_shoot = ExtResource("4_ikmkb")
-volume_db = -13
+volume_db = -7
 crosshair = ExtResource("1_8e4lk")

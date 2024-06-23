@@ -1,11 +1,11 @@
+extends CharacterBody3D
+
 # TODO: add bullet tracers
 # TODO: fix particles offset when hitting angled surfaces
 # TODO: remove camera lerp curves, wait, what do they do really?
 # TODO: re-add weapon model kickback
 # TODO: make camera sway respect inertia, it should move on acceleration and not
 # velocity
-
-extends CharacterBody3D
 
 signal health_updated(int)
 signal weapon_switched(Weapon)
@@ -129,7 +129,7 @@ func handle_action_jump_and_jet(delta: float):
 
 func handle_action_shoot():
 	if Input.is_action_pressed("shoot") and blaster_cooldown.is_stopped():
-		blaster_cooldown.start(weapon.cooldown)
+		blaster_cooldown.start(weapon.firerate_cooldown())
 		Audio.play(weapon.sound_shoot, weapon.volume_db)
 		
 		# Reset muzzle animation

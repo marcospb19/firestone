@@ -4,8 +4,8 @@
 [ext_resource type="Resource" uid="uid://cu2gtxlcmbb34" path="res://src/resources/blaster-repeater.tres" id="2_6epbw"]
 [ext_resource type="Texture2D" uid="uid://8ggihh27mlrr" path="res://assets/sprites/blob_shadow.png" id="2_b0fo8"]
 [ext_resource type="Resource" uid="uid://c56y8pqoyk15f" path="res://src/resources/blaster.tres" id="3_kr4p8"]
+[ext_resource type="Script" path="res://src/scripts/camera.gd" id="4_g8ff7"]
 [ext_resource type="SpriteFrames" uid="uid://dbv3sy5qjatnl" path="res://assets/sprites/burst_animation.tres" id="4_m6ukc"]
-[ext_resource type="Script" path="res://src/scripts/Camera.gd" id="4_y5tyx"]
 [ext_resource type="AudioStream" uid="uid://cydjn1ct3hps2" path="res://assets/sounds/walking.ogg" id="5_ics1s"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_gdq8c"]
@@ -15,7 +15,7 @@ height = 1.0
 [node name="Player" type="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 script = ExtResource("1_ffboj")
-weapons = Array[Resource("res://src/scripts/weapon.gd")]([ExtResource("2_6epbw"), ExtResource("3_kr4p8")])
+weapons = Array[Resource("res://src/scripts/resource-scripts/weapon.gd")]([ExtResource("2_6epbw"), ExtResource("3_kr4p8")])
 
 [node name="Collider" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
@@ -28,7 +28,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 cull_mask = 1048573
 current = true
 fov = 80.0
-script = ExtResource("4_y5tyx")
+script = ExtResource("4_g8ff7")
 
 [node name="ViewportContainer" type="SubViewportContainer" parent="Head/Camera"]
 anchors_preset = 15

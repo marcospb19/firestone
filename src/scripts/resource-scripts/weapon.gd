@@ -9,8 +9,8 @@ extends Resource
 @export var muzzle_position: Vector3  ## On-screen position of muzzle flash
 
 @export_subgroup("Stats")
-@export_range(0.01, 1) var cooldown: float = 0.1  ## Firerate
-@export_range(0, 100) var damage: float  ## Damage per hit
+@export var rpm: float = 60.0  ## Firerate
+@export var damage: float  ## Damage per hit
 # TASK: reimplement ashotguns
 # @export_range(1, 5) var shot_count: int = 1  ## Amount of shots
 
@@ -20,3 +20,7 @@ extends Resource
 
 @export_subgroup("Crosshair")
 @export var crosshair: Texture2D  ## Image of crosshair on-screen
+
+
+func firerate_cooldown():
+	return 1.0 / (rpm / 60.0)

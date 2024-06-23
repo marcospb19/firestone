@@ -1,6 +1,6 @@
 extends Node
 
-const AUDIO_PLAYER_COUNT := 16
+const AUDIO_PLAYER_COUNT := 32
 var audio_players := []
 var next_player_index := 0
 
