@@ -12,6 +12,7 @@ signal hit_enemy(bool)
 @export var movement_speed = 5
 @export var jump_strength = 4
 @export var jet_strength = 23
+
 @export_subgroup("Weapons")
 @export var weapons: Array[Weapon] = []
 
@@ -189,7 +190,7 @@ func change_weapon():
 	var weapon_model = weapon.model.instantiate()
 	weapon_container.add_child(weapon_model)
 	weapon_model.add_to_group("weapon_model")
-	weapon_model.position = weapon.position
+	weapon_model.position = weapon.model_offset
 	# Weapon assets are upside down for some reason so rotate em
 	weapon_model.rotation_degrees = Vector3(0, 180, 0)
 	

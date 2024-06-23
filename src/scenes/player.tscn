@@ -15,7 +15,7 @@ height = 1.0
 [node name="Player" type="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 script = ExtResource("1_ffboj")
-weapons = Array[Resource("res://src/scripts/resource-scripts/weapon.gd")]([ExtResource("2_6epbw"), ExtResource("3_kr4p8")])
+weapons = Array[Resource("res://src/scripts/resources/weapon_resource.gd")]([ExtResource("2_6epbw"), ExtResource("3_kr4p8")])
 
 [node name="Collider" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)

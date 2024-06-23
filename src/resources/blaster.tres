@@ -1,15 +1,14 @@
 [gd_resource type="Resource" script_class="Weapon" load_steps=5 format=3 uid="uid://c56y8pqoyk15f"]
 
 [ext_resource type="PackedScene" uid="uid://b2p7bbkuxf7m" path="res://assets/models/blaster.glb" id="2_ytn7n"]
-[ext_resource type="Script" path="res://src/scripts/resource-scripts/weapon.gd" id="3_5rs1c"]
+[ext_resource type="Script" path="res://src/scripts/resources/weapon_resource.gd" id="4_8ccpx"]
 [ext_resource type="Texture2D" uid="uid://ogyonerhuxqq" path="res://assets/sprites/new-crosshair.png" id="4_ftvrm"]
 [ext_resource type="AudioStream" uid="uid://dkftljsbdhwng" path="res://assets/sounds/blaster.ogg" id="4_ikmkb"]
 
 [resource]
-script = ExtResource("3_5rs1c")
+script = ExtResource("4_8ccpx")
 model = ExtResource("2_ytn7n")
-position = Vector3(0, 0, 0)
-rotation = Vector3(0, 0, 0)
+model_offset = Vector3(0, 0, 0)
 muzzle_position = Vector3(0.1, -0.4, 1.5)
 firerate = 50.0
 damage = 60.0
