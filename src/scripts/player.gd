@@ -163,6 +163,7 @@ func handle_action_shoot():
 				raycast.get_collision_point() + raycast.get_collision_normal() / 10
 			)
 			impact_instance.look_at(camera.global_transform.origin, Vector3.UP, true)
+			impact_instance.rotation_degrees.z = randf_range(0, 90)
 
 
 # Toggle between available weapons (listed in 'weapons')
