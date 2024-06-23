@@ -74,6 +74,3 @@ normal_fade = 0.5
 stream = ExtResource("5_ics1s")
 volume_db = -5.0
 autoplay = true
-
-[node name="Cooldown" type="Timer" parent="."]
-one_shot = true

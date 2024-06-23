@@ -16,28 +16,32 @@ signal hit_enemy(bool)
 @export_subgroup("Weapons")
 @export var weapons: Array[Weapon] = []
 
+var weapon_container_offset := Vector3(1.2, -1.1, -2.75)
+var weapon_index := 0
+var weapon_timers: Array[Timer] = []
+
 var mouse_sensitivity := 0.0008
 var gamepad_sensitivity := 0.075
 var health := 100
 var movement_velocity: Vector3
 var previously_floored := false
-var jump := true
-var weapon_container_offset := Vector3(1.2, -1.1, -2.75)
-var weapon: Weapon
-var weapon_index := 0
+var jump_charges := 0
 
 @onready var camera: Camera3D = $Head/Camera
 @onready var raycast: RayCast3D = $Head/Camera/RayCast
 @onready var weapon_container: Node3D = $Head/Camera/ViewportContainer/WeaponView/CameraItem/WeaponContainer
 @onready var muzzle: AnimatedSprite3D = $Head/Camera/ViewportContainer/WeaponView/CameraItem/WeaponContainer/Muzzle
 @onready var sound_footsteps: AudioStreamPlayer = $SoundFootsteps
-@onready var blaster_cooldown: Timer = $Cooldown
 
 
 func _ready():
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	weapon = weapons[weapon_index]  # Weapon must never be null
 	initiate_change_weapon(weapon_index)
+	for weapon in weapons:
+		var timer = Timer.new()
+		timer.wait_time = weapon.firerate_cooldown()
+		timer.one_shot = true
+		weapon_timers.append(timer)
+		self.add_child(timer)
 
 
 # Rotates player look, input is X and Y diff
@@ -106,10 +110,10 @@ func handle_controls(delta: float):
 	
 	# Jumping
 	if Input.is_action_just_pressed("jump"):
-		if jump:
+		if jump_charges > 0:
 			Audio.play_at_one_of(["jump_a.ogg", "jump_b.ogg", "jump_c.ogg"])
 			velocity.y = -jump_strength
-			jump = false
+			jump_charges -= 1
 
 
 func handle_action_jump_and_jet(delta: float):
@@ -123,15 +127,15 @@ func handle_action_jump_and_jet(delta: float):
 
 
 func handle_action_shoot():
-	if Input.is_action_pressed("shoot") and blaster_cooldown.is_stopped():
-		blaster_cooldown.start(weapon.firerate_cooldown())
-		Audio.play(weapon.fire_sound, weapon.volume_adjust)
+	if Input.is_action_pressed("shoot") and current_weapon_timer().is_stopped():
+		current_weapon_timer().start(current_weapon().firerate_cooldown())
+		Audio.play(current_weapon().fire_sound, current_weapon().volume_adjust)
 		
 		# Reset muzzle animation
 		muzzle.play()
 		muzzle.rotation_degrees.z = randf_range(0, 90)
 		muzzle.scale = Vector3.ONE * randf_range(0.35, 0.70)
-		muzzle.position = -weapon.muzzle_position
+		muzzle.position = -current_weapon().muzzle_position
 		
 		raycast.force_raycast_update()
 		
@@ -141,7 +145,7 @@ func handle_action_shoot():
 			
 			# Hitting an enemy
 			if collider.has_method("damage"):
-				var killed = collider.damage(weapon.damage)
+				var killed = collider.damage(current_weapon().damage)
 				hit_enemy.emit(killed)
 			
 			# Creating an impact animation
@@ -185,14 +189,14 @@ func change_weapon():
 	self.get_tree().call_group("weapon_model", "queue_free")
 	
 	# Step 2. Place new weapon model in weapon_container
-	weapon = weapons[weapon_index]
-	weapon_switched.emit(weapon)
-	var weapon_model = weapon.model.instantiate()
-	weapon_container.add_child(weapon_model)
+	weapon_switched.emit(current_weapon())
+	var weapon_model = current_weapon().model.instantiate()
 	weapon_model.add_to_group("weapon_model")
-	weapon_model.position = weapon.model_offset
+	weapon_model.position = current_weapon().model_offset
 	# Weapon assets are upside down for some reason so rotate em
 	weapon_model.rotation_degrees = Vector3(0, 180, 0)
+
+	weapon_container.add_child(weapon_model)
 	
 	# Step 3. Set model to only render on layer 2 (the weapon camera)
 	for child in weapon_model.find_children("*", "MeshInstance3D"):
@@ -207,3 +211,11 @@ func damage(amount: int):
 	health_updated.emit(health)  # Update health on HUD
 	if health < 0:
 		get_tree().reload_current_scene()  # Reset game when out of health
+
+
+func current_weapon() -> Weapon:
+	return weapons[weapon_index]
+
+
+func current_weapon_timer() -> Timer:
+	return weapon_timers[weapon_index]
