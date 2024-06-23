@@ -18,3 +18,7 @@ func clear_current_camera(id: Node):
 		"node %s is exiting as camera, but it wasn't the camera" % id,
 	)
 	current_camera = null
+
+
+func root() -> Window:
+	return self.get_tree().root

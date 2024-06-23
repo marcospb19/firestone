@@ -1,11 +1,8 @@
 extends CharacterBody3D
 
 # TODO: add bullet tracers
-# TODO: fix particles offset when hitting angled surfaces
-# TODO: remove camera lerp curves, wait, what do they do really?
 # TODO: re-add weapon model kickback
-# TODO: make camera sway respect inertia, it should move on acceleration and not
-# velocity
+# TODO: make camera vertical swing respect inertia
 
 signal health_updated(int)
 signal weapon_switched(Weapon)
@@ -18,22 +15,22 @@ signal hit_enemy(bool)
 @export_subgroup("Weapons")
 @export var weapons: Array[Weapon] = []
 
-var weapon_index := 0
 var mouse_sensitivity := 0.0008
 var gamepad_sensitivity := 0.075
 var health := 100
+var movement_velocity: Vector3
 var previously_floored := false
 var jump := true
 var weapon_container_offset := Vector3(1.2, -1.1, -2.75)
-var movement_velocity: Vector3
 var weapon: Weapon
+var weapon_index := 0
 
-@onready var camera := $Head/Camera
-@onready var raycast := $Head/Camera/RayCast
-@onready var weapon_container := $Head/Camera/ViewportContainer/WeaponView/CameraItem/WeaponContainer
-@onready var muzzle := $Head/Camera/ViewportContainer/WeaponView/CameraItem/WeaponContainer/Muzzle
-@onready var sound_footsteps := $SoundFootsteps
-@onready var blaster_cooldown := $Cooldown
+@onready var camera: Camera3D = $Head/Camera
+@onready var raycast: RayCast3D = $Head/Camera/RayCast
+@onready var weapon_container: Node3D = $Head/Camera/ViewportContainer/WeaponView/CameraItem/WeaponContainer
+@onready var muzzle: AnimatedSprite3D = $Head/Camera/ViewportContainer/WeaponView/CameraItem/WeaponContainer/Muzzle
+@onready var sound_footsteps: AudioStreamPlayer = $SoundFootsteps
+@onready var blaster_cooldown: Timer = $Cooldown
 
 
 func _ready():
@@ -50,7 +47,7 @@ func apply_rotation(diff: Vector2):
 	camera.rotation.x = clampf(camera.rotation.x - diff.y, deg_to_rad(-90.0), deg_to_rad(90.0))
 
 
-func _physics_process(delta):
+func _physics_process(delta: float):
 	# apply gravity
 	velocity.y -= 20 * delta
 	
@@ -65,15 +62,12 @@ func _physics_process(delta):
 	sound_footsteps.stream_paused = true
 	
 	if self.is_on_floor():
-		if abs(velocity.x) > 1 or abs(velocity.z) > 1:
+		var trigger_footsteps = abs(velocity.x) > 1 or abs(velocity.z) > 1
+		if trigger_footsteps:
 			sound_footsteps.stream_paused = false
 	
-	#Landing after jump or falling
-	camera.position.y = lerp(camera.position.y, 0.0, delta * 5)
-	
-	if self.is_on_floor() and velocity.y > 1 and !previously_floored:  # Landed
+	if self.is_on_floor() and velocity.y > 1 and !previously_floored:
 		Audio.play_at("land.ogg")
-		camera.position.y = -0.1
 	
 	previously_floored = self.is_on_floor()
 	
@@ -112,7 +106,7 @@ func handle_controls(delta: float):
 	# Jumping
 	if Input.is_action_just_pressed("jump"):
 		if jump:
-			Audio.play_at(["jump_a.ogg", "jump_b.ogg", "jump_c.ogg"])
+			Audio.play_at_one_of(["jump_a.ogg", "jump_b.ogg", "jump_c.ogg"])
 			velocity.y = -jump_strength
 			jump = false
 
@@ -157,11 +151,9 @@ func handle_action_shoot():
 			# TODO: add singleton World for a method to add effects like this
 			# to the world into a specific node, instead of polluting the tree
 			# root
-			self.get_tree().root.add_child(impact_instance)
+			Utils.root().add_child(impact_instance)
 			
-			impact_instance.position = (
-				raycast.get_collision_point() + raycast.get_collision_normal() / 10
-			)
+			impact_instance.position = raycast.get_collision_point()
 			impact_instance.look_at(camera.global_transform.origin, Vector3.UP, true)
 			impact_instance.rotation_degrees.z = randf_range(0, 90)
 
@@ -185,6 +177,7 @@ func initiate_change_weapon(index):
 	tween.tween_callback(change_weapon)  # Changes the model
 
 
+# TASK: most of this settings could go in a separated script
 # Switches the weapon model (off-screen)
 func change_weapon():
 	# Step 1. Remove previous weapon model(s) from weapon_container

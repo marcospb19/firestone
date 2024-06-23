@@ -1,10 +1,11 @@
 extends CanvasLayer
 
-@onready var health = $Health
-@onready var crosshair = $Crosshair
-@onready var hitmarker = $Hitmarker
+@onready var health: Label = $Health
+@onready var crosshair: TextureRect = $Crosshair
+@onready var hitmarker: TextureRect = $Hitmarker
 
 var tween: Tween
+
 
 func _on_health_updated(value: int):
 	health.text = str(value) + "%"
