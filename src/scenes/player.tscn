@@ -42,7 +42,7 @@ stretch = true
 transparent_bg = true
 handle_input_locally = false
 msaa_3d = 1
-size = Vector2i(1280, 720)
+size = Vector2i(1152, 648)
 render_target_update_mode = 4
 
 [node name="CameraItem" type="Camera3D" parent="Head/Camera/ViewportContainer/WeaponView"]

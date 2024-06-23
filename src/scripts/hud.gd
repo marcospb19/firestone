@@ -10,7 +10,7 @@ func _on_health_updated(value: int):
 
 
 func _on_player_weapon_switched(weapon: Weapon):
-	crosshair.texture = weapon.crosshair
+	crosshair.texture = weapon.crosshair_texture
 
 
 func _on_player_hit_enemy(killed: bool):

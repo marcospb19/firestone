@@ -4,7 +4,7 @@ extends Node
 var current_camera: Camera3D
 
 
-func set_current_camera(id: Node):
+func set_current_camera(id: Camera3D):
 	assert(
 		current_camera == null,
 		"node %s tried setting current_camera but it wasn't null" % id,

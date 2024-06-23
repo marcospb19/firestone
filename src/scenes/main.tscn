@@ -31,23 +31,6 @@ shadow_opacity = 0.75
 [node name="HUD" type="CanvasLayer" parent="."]
 script = ExtResource("3_s8mkj")
 
-[node name="Crosshair" type="TextureRect" parent="HUD"]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
-grow_horizontal = 2
-grow_vertical = 2
-scale = Vector2(0.35, 0.35)
-pivot_offset = Vector2(64, 64)
-size_flags_horizontal = 4
-size_flags_vertical = 4
-
 [node name="Hitmarker" type="TextureRect" parent="HUD"]
 anchors_preset = 8
 anchor_left = 0.5
@@ -65,15 +48,30 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 
 [node name="Health" type="Label" parent="HUD"]
-offset_left = 48.0
-offset_top = 627.0
-offset_right = 138.0
-offset_bottom = 672.0
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 44.0
+offset_top = -80.0
+offset_right = 134.0
+offset_bottom = -35.0
+grow_vertical = 0
 size_flags_horizontal = 0
 size_flags_vertical = 8
 text = "100%"
 label_settings = SubResource("LabelSettings_fpmwk")
 vertical_alignment = 2
+
+[node name="Crosshair" type="TextureRect" parent="HUD"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 
 [node name="Enemies" type="Node" parent="."]
 
@@ -98,7 +96,7 @@ player = NodePath("../../Player")
 [node name="wall-low" parent="Level" instance=ExtResource("5_6vel1")]
 transform = Transform3D(0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, 0.965926, -1.92088, 1.05, -6.90166)
 
-[node name="wall-low3" parent="Level" instance=ExtResource("5_6vel1")]
+[node name="wall-low2" parent="Level" instance=ExtResource("5_6vel1")]
 transform = Transform3D(-1, 0, -1.19209e-07, 0, 1, 0, 1.19209e-07, 0, -1, 6.07912, 1.05, 6.59834)
 
 [node name="platform" parent="Level" instance=ExtResource("5_3s40e")]

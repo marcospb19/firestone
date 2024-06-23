@@ -130,7 +130,7 @@ func handle_action_jump_and_jet(delta: float):
 func handle_action_shoot():
 	if Input.is_action_pressed("shoot") and blaster_cooldown.is_stopped():
 		blaster_cooldown.start(weapon.firerate_cooldown())
-		Audio.play(weapon.sound_shoot, weapon.volume_db)
+		Audio.play(weapon.fire_sound, weapon.volume_adjust)
 		
 		# Reset muzzle animation
 		muzzle.play()
