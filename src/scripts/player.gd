@@ -201,9 +201,6 @@ func change_weapon():
 	# Step 3. Set model to only render on layer 2 (the weapon camera)
 	for child in weapon_model.find_children("*", "MeshInstance3D"):
 		child.layers = 2
-	
-	# Set weapon data
-	raycast.target_position = Vector3(0, 0, -10000)
 
 
 func damage(amount: int):
