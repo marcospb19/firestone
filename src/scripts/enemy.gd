@@ -4,12 +4,11 @@ extends Node3D
 
 var health := 100.0
 var time := 0.0
-# TASK: use naming conventions for all bools in project
 var already_dead := false
 
 @onready var raycast: RayCast3D = $RayCast
-@onready var muzzle_a: AnimatedSprite3D = $MuzzleA
-@onready var muzzle_b: AnimatedSprite3D = $MuzzleB
+@onready var muzzle_left: AnimatedSprite3D = $LeftMuzzle
+@onready var muzzle_right: AnimatedSprite3D = $RightMuzzle
 
 
 func _process(delta: float):
@@ -36,18 +35,16 @@ func damage(amount: int) -> bool:
 # Shoot when timer hits 0
 func _on_timer_timeout():
 	raycast.force_raycast_update()
-	
 	if raycast.is_colliding():
 		var collider = raycast.get_collider()
 		
 		# Raycast collides with player
 		if collider.has_method("damage"):
-			collider.damage(5)  # Apply damage to player
+			collider.damage(5)
 			
-			# Play muzzle flash animation(s)
-			muzzle_a.play()
-			muzzle_a.rotation_degrees.z = randf_range(0, 90)
-			muzzle_b.play()
-			muzzle_b.rotation_degrees.z = randf_range(0, 90)
+			muzzle_left.play()
+			muzzle_left.rotation_degrees.z = randf_range(0, 90)
+			muzzle_right.play()
+			muzzle_right.rotation_degrees.z = randf_range(0, 90)
 			
 			Audio.play_at("enemy_attack.ogg")

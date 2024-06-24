@@ -4,9 +4,9 @@ extends CharacterBody3D
 # TODO: re-add weapon model kickback
 # TODO: make camera vertical swing respect inertia
 
-signal health_updated(int)
-signal weapon_switched(Weapon)
-signal hit_enemy(bool)
+signal died
+
+@onready var ui = $InGameUI
 
 @export_subgroup("Properties")
 @export var movement_speed := 5.0
@@ -37,9 +37,10 @@ var previously_floored := false
 
 
 func _ready():
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	initiate_change_weapon(weapon_index)
 	for weapon in weapons:
-		var timer = Timer.new()
+		var timer := Timer.new()
 		timer.wait_time = weapon.firerate_cooldown()
 		timer.one_shot = true
 		weapon_timers.append(timer)
@@ -58,8 +59,13 @@ func _physics_process(delta: float):
 	# apply gravity
 	velocity.y -= 20 * delta
 	
-	# Handle functions
-	handle_controls(delta)
+	if Utils.is_mouse_captured():
+		handle_controls(delta)
+	
+	self.move_and_slide()
+	
+	if position.y < -10:
+		died.emit()
 	
 	weapon_container.position = lerp(
 		weapon_container.position, WEAPON_CONTAINER_OFFSET - (velocity / 30), delta * 10
@@ -75,17 +81,12 @@ func _physics_process(delta: float):
 	
 	if self.is_on_floor() and velocity.y > 1 and !previously_floored:
 		Audio.play_at("land.ogg")
-	
 	previously_floored = self.is_on_floor()
-	
-	# Falling/respawning
-	if position.y < -10:
-		self.get_tree().reload_current_scene()
 
 
 func _input(event):
 	# Mouse look control
-	if event is InputEventMouseMotion and InputExt.is_mouse_captured():
+	if event is InputEventMouseMotion and Utils.is_mouse_captured():
 		var mouse_rotation = event.relative * mouse_sensitivity
 		apply_rotation(mouse_rotation)
 
@@ -95,13 +96,11 @@ func handle_controls(delta: float):
 	handle_action_weapon_toggle()
 	handle_action_jump_and_jet(delta)
 	
-	# Movement
+	# Flat movement
 	var input = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	var movement = Vector3(input.x, 0, input.y).limit_length(1.0) * movement_speed
+	var movement := Vector3(input.x, 0, input.y).limit_length(1.0) * movement_speed
 	movement.y = velocity.y
 	velocity = transform.basis * movement
-	
-	self.move_and_slide()
 	
 	# Gamepad look control
 	var gamepad_rotation_input := Input.get_vector(
@@ -143,7 +142,7 @@ func handle_action_shoot():
 			# Hitting an enemy
 			if collider.has_method("damage"):
 				var killed = collider.damage(current_weapon().damage)
-				hit_enemy.emit(killed)
+				ui.trigger_hitmarker(killed)
 			
 			# Creating an impact animation
 			var impact = preload("res://src/scenes/impact.tscn")
@@ -165,7 +164,6 @@ func handle_action_weapon_toggle():
 	if Input.is_action_just_pressed("weapon_toggle"):
 		weapon_index = wrap(weapon_index + 1, 0, weapons.size())
 		initiate_change_weapon(weapon_index)
-		
 		Audio.play_at("weapon_change.ogg")
 
 
@@ -186,25 +184,25 @@ func change_weapon():
 	self.get_tree().call_group("weapon_model", "queue_free")
 	
 	# Step 2. Place new weapon model in weapon_container
-	weapon_switched.emit(current_weapon())
+	ui.switch_weapon(current_weapon())
 	var weapon_model = current_weapon().model.instantiate()
 	weapon_model.add_to_group("weapon_model")
-	weapon_model.position = current_weapon().model_offset
-	# Weapon assets are upside down for some reason so rotate em
-	weapon_model.rotation_degrees = Vector3(0, 180, 0)
-
 	weapon_container.add_child(weapon_model)
 	
-	# Step 3. Set model to only render on layer 2 (the weapon camera)
+	# Step 3. Reposition model
+	weapon_model.position = current_weapon().model_offset
+	weapon_model.rotation_degrees = Vector3(0, 180, 0)  # Model assets are upside down lol
+	
+	# Step 4. Set model to only render on layer 2 (the weapon camera)
 	for child in weapon_model.find_children("*", "MeshInstance3D"):
 		child.layers = 2
 
 
 func damage(amount: int):
 	health -= amount
-	health_updated.emit(health)  # Update health on HUD
+	ui.update_player_health(health)
 	if health < 0:
-		get_tree().reload_current_scene()  # Reset game when out of health
+		died.emit()
 
 
 func current_weapon() -> Weapon:

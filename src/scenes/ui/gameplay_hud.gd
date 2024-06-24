@@ -1,37 +1,37 @@
-extends CanvasLayer
+extends Control
 
 @onready var health: Label = $Health
 @onready var crosshair: TextureRect = $Crosshair
 @onready var hitmarker: TextureRect = $Hitmarker
 
-var tween: Tween
+var hitmarker_tween: Tween
 
 
-func _on_health_updated(value: int):
+func update_health(value: int):
 	health.text = str(value) + "%"
 
 
-func _on_player_weapon_switched(weapon: Weapon):
+func switch_weapon(weapon: Weapon):
 	crosshair.texture = weapon.crosshair_texture
 
 
-func _on_player_hit_enemy(killed: bool):
-	var s = hitmarker_tween_settings(killed)
+func trigger_hitmarker(hit_killed: bool):
+	var s = hitmarker_tween_settings(hit_killed)
 	
 	hitmarker.texture = s.texture
 	hitmarker.scale = Vector2.ONE * s.marker_scale
 	
 	# Clear last tween
-	if tween is Tween:
-		tween.kill()
+	if hitmarker_tween is Tween:
+		hitmarker_tween.kill()
 	
 	# Set new tween
-	tween = self.create_tween()
-	tween.set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
-	tween.tween_method(hitmarker.set_modulate, s.from, s.to, s.duration)
+	hitmarker_tween = self.create_tween()
+	hitmarker_tween.set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+	hitmarker_tween.tween_method(hitmarker.set_modulate, s.from, s.to, s.duration)
 	
 	if s.hold_black_effect:
-		tween.chain().tween_method(
+		hitmarker_tween.chain().tween_method(
 			hitmarker.set_modulate, s.to, Color.BLACK * Color.TRANSPARENT, 0.5
 		)
 

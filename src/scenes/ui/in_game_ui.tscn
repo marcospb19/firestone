@@ -1,0 +1,116 @@
+[gd_scene load_steps=6 format=3 uid="uid://bsx1usq366uih"]
+
+[ext_resource type="Script" path="res://src/scripts/in_game_ui.gd" id="1_qk8jy"]
+[ext_resource type="FontFile" uid="uid://biqtga8moh7ah" path="res://assets/fonts/lilita_one_regular.ttf" id="2_jxnfd"]
+[ext_resource type="Script" path="res://src/scenes/ui/gameplay_hud.gd" id="2_ts2v7"]
+[ext_resource type="Script" path="res://src/scenes/ui/options_menu.gd" id="4_6mikp"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_fpmwk"]
+font = ExtResource("2_jxnfd")
+font_size = 36
+outline_size = 12
+outline_color = Color(0, 0, 0, 0.470588)
+
+[node name="InGameUI" type="CanvasLayer"]
+script = ExtResource("1_qk8jy")
+
+[node name="GameplayHUD" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_ts2v7")
+
+[node name="Hitmarker" type="TextureRect" parent="GameplayHUD"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(64, 64)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Health" type="Label" parent="GameplayHUD"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = -87.0
+offset_right = 140.0
+offset_bottom = -42.0
+grow_vertical = 0
+size_flags_horizontal = 0
+size_flags_vertical = 8
+text = "100%"
+label_settings = SubResource("LabelSettings_fpmwk")
+vertical_alignment = 2
+
+[node name="Crosshair" type="TextureRect" parent="GameplayHUD"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="OptionsMenu" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_6mikp")
+
+[node name="BackgroundColor" type="ColorRect" parent="OptionsMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.529412)
+
+[node name="Buttons" type="HFlowContainer" parent="OptionsMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -46.5
+offset_top = -33.0
+offset_right = 46.5
+offset_bottom = 33.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ResumeButton" type="Button" parent="OptionsMenu/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Resume"
+
+[node name="MainMenuButton" type="Button" parent="OptionsMenu/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Go to main menu"
+
+[connection signal="menu_closed" from="OptionsMenu" to="." method="_on_options_menu_menu_closed"]
+[connection signal="pressed" from="OptionsMenu/Buttons/ResumeButton" to="OptionsMenu" method="_on_resume_button_pressed"]
+[connection signal="pressed" from="OptionsMenu/Buttons/MainMenuButton" to="OptionsMenu" method="_on_main_menu_button_pressed"]
