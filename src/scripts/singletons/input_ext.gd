@@ -1,6 +1,10 @@
 extends Node
 
 
+func _ready():
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
 func _process(_delta):
 	# Mouse capture
 	if Input.is_action_just_pressed("mouse_capture"):

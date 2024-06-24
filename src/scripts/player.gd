@@ -9,23 +9,25 @@ signal weapon_switched(Weapon)
 signal hit_enemy(bool)
 
 @export_subgroup("Properties")
-@export var movement_speed = 5
-@export var jump_strength = 4
-@export var jet_strength = 23
+@export var movement_speed := 5.0
+@export var jump_strength := 6.0
+@export var jet_strength := 23.0
 
 @export_subgroup("Weapons")
 @export var weapons: Array[Weapon] = []
 
-var weapon_container_offset := Vector3(1.2, -1.1, -2.75)
+const WEAPON_CONTAINER_OFFSET := Vector3(1.2, -1.1, -2.75)
+
 var weapon_index := 0
 var weapon_timers: Array[Timer] = []
 
 var mouse_sensitivity := 0.0008
 var gamepad_sensitivity := 0.075
+
 var health := 100
+
 var movement_velocity: Vector3
 var previously_floored := false
-var jump_charges := 0
 
 @onready var camera: Camera3D = $Head/Camera
 @onready var raycast: RayCast3D = $Head/Camera/RayCast
@@ -60,7 +62,7 @@ func _physics_process(delta: float):
 	handle_controls(delta)
 	
 	weapon_container.position = lerp(
-		weapon_container.position, weapon_container_offset - (velocity / 30), delta * 10
+		weapon_container.position, WEAPON_CONTAINER_OFFSET - (velocity / 30), delta * 10
 	)
 	
 	# Movement sound
@@ -107,13 +109,6 @@ func handle_controls(delta: float):
 	)
 	var gamepad_rotation = gamepad_rotation_input.limit_length(1.0) * gamepad_sensitivity
 	apply_rotation(gamepad_rotation)
-	
-	# Jumping
-	if Input.is_action_just_pressed("jump"):
-		if jump_charges > 0:
-			Audio.play_at_one_of(["jump_a.ogg", "jump_b.ogg", "jump_c.ogg"])
-			velocity.y = -jump_strength
-			jump_charges -= 1
 
 
 func handle_action_jump_and_jet(delta: float):
@@ -122,8 +117,10 @@ func handle_action_jump_and_jet(delta: float):
 	
 	if Input.is_action_pressed("jump"):
 		if self.is_on_floor():
+			Audio.play_at_one_of(["jump_a.ogg", "jump_b.ogg", "jump_c.ogg"])
 			velocity.y = max(jump_strength, velocity.y + jump_strength / 2.0)
-		velocity.y += jet_strength * delta
+		else:
+			velocity.y += jet_strength * delta
 
 
 func handle_action_shoot():
@@ -177,7 +174,7 @@ func initiate_change_weapon(index):
 	weapon_index = index
 	var tween = self.create_tween()
 	tween.tween_property(
-		weapon_container, "position", weapon_container_offset - Vector3(0, 1, 0), 0.1
+		weapon_container, "position", WEAPON_CONTAINER_OFFSET - Vector3(0, 1, 0), 0.1
 	)
 	tween.tween_callback(change_weapon)  # Changes the model
 
