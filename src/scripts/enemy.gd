@@ -13,7 +13,7 @@ var already_dead := false
 
 
 func _process(delta: float):
-	self.look_at(player.position + Vector3.UP * 0.5, Vector3.UP, true)  # Look at player
+	self.look_at(player.global_position + Vector3.UP * 0.5, Vector3.UP, true)  # Look at player
 	position.y += cos(time * 5) * delta  # Up and down swing
 	time += delta
 
