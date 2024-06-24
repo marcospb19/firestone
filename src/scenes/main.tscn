@@ -17,14 +17,22 @@ outline_size = 12
 outline_color = Color(0, 0, 0, 0.470588)
 
 [node name="Main" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5788, 4.51965, -5.70257)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource("1_q8fpv")
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.422618, -0.694272, 0.582563, 0, 0.642788, 0.766044, -0.906308, 0.323744, -0.271654, 0, 0, 0)
+transform = Transform3D(-0.422618, -0.694272, 0.582564, 0, 0.642788, 0.766044, -0.906308, 0.323744, -0.271654, 0, 0, 0)
+light_color = Color(1, 0.9, 0.8, 1)
+light_energy = 0.55
+light_bake_mode = 1
 shadow_enabled = true
 shadow_opacity = 0.75
+sky_mode = 1
+
+[node name="Player" parent="." instance=ExtResource("2_elriq")]
+transform = Transform3D(-0.145548, 0, 0.989351, 0, 1, 0, -0.989351, 0, -0.145548, 0, -0.857274, 0)
 
 [node name="HUD" type="CanvasLayer" parent="."]
 script = ExtResource("3_s8mkj")
@@ -82,11 +90,7 @@ transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -9.5, 
 player = NodePath("../../Player")
 
 [node name="enemy-flying3" parent="Enemies" node_paths=PackedStringArray("player") instance=ExtResource("8_7ty2f")]
-transform = Transform3D(-0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, -0.707107, 5.5, 3.5, 9)
-player = NodePath("../../Player")
-
-[node name="enemy-flying4" parent="Enemies" node_paths=PackedStringArray("player") instance=ExtResource("8_7ty2f")]
-transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 15.5, 4, -7.5)
+transform = Transform3D(-0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, -0.707107, 5.5, -11.1161, 9)
 player = NodePath("../../Player")
 
 [node name="Level" type="Node" parent="."]
