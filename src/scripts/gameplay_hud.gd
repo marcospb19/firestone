@@ -1,6 +1,6 @@
 extends Control
 
-@onready var health: Label = $Health
+@onready var health: ProgressBar = $Health
 @onready var crosshair: TextureRect = $Crosshair
 @onready var hitmarker: TextureRect = $Hitmarker
 
@@ -8,7 +8,7 @@ var hitmarker_tween: Tween
 
 
 func update_health(value: int):
-	health.text = str(value) + "%"
+	health.update_health(value)
 
 
 func switch_weapon(weapon: Weapon):

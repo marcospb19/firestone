@@ -1,15 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://bsx1usq366uih"]
+[gd_scene load_steps=5 format=3 uid="uid://bsx1usq366uih"]
 
 [ext_resource type="Script" path="res://src/scripts/in_game_ui.gd" id="1_qk8jy"]
-[ext_resource type="FontFile" uid="uid://biqtga8moh7ah" path="res://assets/fonts/lilita_one_regular.ttf" id="2_jxnfd"]
 [ext_resource type="Script" path="res://src/scripts/gameplay_hud.gd" id="2_oqh4n"]
+[ext_resource type="Script" path="res://src/scenes/ui/Health.gd" id="3_4eq6a"]
 [ext_resource type="Script" path="res://src/scripts/options_menu.gd" id="4_6mikp"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_fpmwk"]
-font = ExtResource("2_jxnfd")
-font_size = 36
-outline_size = 12
-outline_color = Color(0, 0, 0, 0.470588)
 
 [node name="InGameUI" type="CanvasLayer"]
 script = ExtResource("1_qk8jy")
@@ -40,21 +34,21 @@ pivot_offset = Vector2(64, 64)
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="Health" type="Label" parent="GameplayHUD"]
+[node name="Health" type="ProgressBar" parent="GameplayHUD"]
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 50.0
-offset_top = -87.0
-offset_right = 140.0
-offset_bottom = -42.0
+offset_left = 70.0
+offset_top = -112.0
+offset_right = 737.0
+offset_bottom = -55.0
 grow_vertical = 0
 size_flags_horizontal = 0
 size_flags_vertical = 8
-text = "100%"
-label_settings = SubResource("LabelSettings_fpmwk")
-vertical_alignment = 2
+value = 100.0
+show_percentage = false
+script = ExtResource("3_4eq6a")
 
 [node name="Crosshair" type="TextureRect" parent="GameplayHUD"]
 layout_mode = 1
@@ -94,9 +88,9 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -46.5
+offset_left = -71.0
 offset_top = -33.0
-offset_right = 46.5
+offset_right = 71.0
 offset_bottom = 33.0
 grow_horizontal = 2
 grow_vertical = 2
