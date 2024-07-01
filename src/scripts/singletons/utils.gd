@@ -49,6 +49,7 @@ func custom_growth_curve(value: float, rate := 1.0, range_ := Vector2(0, 1)) -> 
 	return increase_from_rate
 
 
+# BUG: low FPS makes the game run in slow motion
 func set_low_fps_cap():
 	Engine.max_fps = 45
 

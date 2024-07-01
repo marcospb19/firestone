@@ -145,7 +145,7 @@ func handle_action_shoot():
 				ui.trigger_hitmarker(killed)
 			
 			# Creating an impact animation
-			var impact = preload("res://src/scenes/impact.tscn")
+			var impact = preload("res://src/scenes/entities/impact.tscn")
 			var impact_instance = impact.instantiate()
 			impact_instance.play("shot")
 			

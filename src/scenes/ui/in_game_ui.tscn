@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" path="res://src/scripts/in_game_ui.gd" id="1_qk8jy"]
 [ext_resource type="FontFile" uid="uid://biqtga8moh7ah" path="res://assets/fonts/lilita_one_regular.ttf" id="2_jxnfd"]
-[ext_resource type="Script" path="res://src/scenes/ui/gameplay_hud.gd" id="2_ts2v7"]
-[ext_resource type="Script" path="res://src/scenes/ui/options_menu.gd" id="4_6mikp"]
+[ext_resource type="Script" path="res://src/scripts/gameplay_hud.gd" id="2_oqh4n"]
+[ext_resource type="Script" path="res://src/scripts/options_menu.gd" id="4_6mikp"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_fpmwk"]
 font = ExtResource("2_jxnfd")
@@ -21,7 +21,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("2_ts2v7")
+script = ExtResource("2_oqh4n")
 
 [node name="Hitmarker" type="TextureRect" parent="GameplayHUD"]
 layout_mode = 1

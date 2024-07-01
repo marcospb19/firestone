@@ -28,12 +28,12 @@ grow_vertical = 2
 [node name="TrainLevelButton" type="Button" parent="Buttons"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "train level"
+text = "containers"
 
 [node name="DemoLevelButton" type="Button" parent="Buttons"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "demo level"
+text = "platforms"
 
 [node name="ExitButton" type="Button" parent="Buttons"]
 layout_mode = 2
