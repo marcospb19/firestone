@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://bsx1usq366uih"]
+[gd_scene load_steps=7 format=3 uid="uid://bsx1usq366uih"]
 
 [ext_resource type="Script" path="res://src/elements/ui/in_game_ui.gd" id="1_6al0f"]
 [ext_resource type="Script" path="res://src/elements/ui/hud/gameplay_hud.gd" id="2_nwc7u"]
 [ext_resource type="Script" path="res://src/elements/ui/hud/health_bar.gd" id="3_6opnk"]
-[ext_resource type="Theme" uid="uid://m03cgcejchws" path="res://src/elements/ui/font_theme.tres" id="4_4nbmt"]
+[ext_resource type="Theme" uid="uid://m03cgcejchws" path="res://src/elements/ui/style/font_theme.tres" id="4_4nbmt"]
 [ext_resource type="Script" path="res://src/elements/ui/menus/options_menu.gd" id="4_8cb5d"]
+[ext_resource type="Script" path="res://src/elements/ui/style/appliers/button_group.gd" id="6_3i5ob"]
 
 [node name="InGameUI" type="CanvasLayer"]
 script = ExtResource("1_6al0f")
@@ -96,6 +97,7 @@ offset_right = 71.0
 offset_bottom = 33.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("6_3i5ob")
 
 [node name="ResumeButton" type="Button" parent="OptionsMenu/Buttons"]
 layout_mode = 2
