@@ -39,6 +39,9 @@ var previously_floored := false
 
 
 func _ready():
+	# for some reason, my editor is bugged and this keeps toggling by itself
+	sound_footsteps.stream_paused = true
+	
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	initiate_change_weapon(weapon_index)
 	for weapon in weapons:
@@ -150,7 +153,7 @@ func handle_action_shoot():
 				ui.trigger_hitmarker(killed)
 			
 			# Creating an impact animation
-			var impact = preload("res://src/scenes/entities/impact.tscn")
+			var impact = preload("res://src/elements/weapons/particles/impact_particle.tscn")
 			var impact_instance = impact.instantiate()
 			impact_instance.play("shot")
 			

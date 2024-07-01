@@ -9,9 +9,9 @@ enum MainScene {
 }
 
 const SCENE_PATHS := {
-	MainScene.MAIN_MENU: "res://src/scenes/ui/main_menu.tscn",
-	MainScene.LEVEL_DEMO: "res://src/scenes/levels/demo_level.tscn",
-	MainScene.LEVEL_TRAIN: "res://src/scenes/levels/train_level.tscn",
+	MainScene.MAIN_MENU: "res://src/elements/ui/menus/main_menu.tscn",
+	MainScene.LEVEL_DEMO: "res://src/elements/levels/demo_level.tscn",
+	MainScene.LEVEL_TRAIN: "res://src/elements/levels/train_level.tscn",
 }
 
 var last_loaded_scene: MainScene

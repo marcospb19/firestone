@@ -1,11 +1,11 @@
 [gd_scene load_steps=8 format=3 uid="uid://ctqae8e73sa1w"]
 
-[ext_resource type="PackedScene" uid="uid://dch0wy1f03eim" path="res://src/scenes/environment.tscn" id="1_e2l1x"]
-[ext_resource type="PackedScene" uid="uid://bm8usyqlqf2aj" path="res://src/scenes/objects/floor.tscn" id="1_ftakv"]
+[ext_resource type="PackedScene" uid="uid://dch0wy1f03eim" path="res://src/elements/levels/level_environment.tscn" id="1_e2l1x"]
+[ext_resource type="PackedScene" uid="uid://bm8usyqlqf2aj" path="res://src/elements/levels/objects/floor.tscn" id="1_ftakv"]
 [ext_resource type="PackedScene" uid="uid://dl2ed4gkybggf" path="res://src/scenes/entities/player.tscn" id="2_j2bnf"]
-[ext_resource type="PackedScene" uid="uid://cfltfkmumxr0p" path="res://src/scenes/objects/container_closed.tscn" id="4_aukpy"]
-[ext_resource type="PackedScene" uid="uid://hqqwpcluhpjc" path="res://src/scenes/objects/container_half_open.tscn" id="5_uheab"]
-[ext_resource type="PackedScene" uid="uid://d0nqcd05ww8yx" path="res://src/scenes/objects/container_open.tscn" id="6_g4syy"]
+[ext_resource type="PackedScene" uid="uid://cfltfkmumxr0p" path="res://src/elements/levels/objects/container_closed.tscn" id="4_aukpy"]
+[ext_resource type="PackedScene" uid="uid://hqqwpcluhpjc" path="res://src/elements/levels/objects/container_half_open.tscn" id="5_uheab"]
+[ext_resource type="PackedScene" uid="uid://d0nqcd05ww8yx" path="res://src/elements/levels/objects/container_open.tscn" id="6_g4syy"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n01q4"]
 transparency = 1
