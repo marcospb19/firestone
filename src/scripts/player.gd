@@ -17,6 +17,8 @@ signal died
 @export var weapons: Array[Weapon] = []
 
 const WEAPON_CONTAINER_OFFSET := Vector3(1.2, -1.1, -2.75)
+# When walking forward (straight or diagonally), get a 20% boost
+const RUN_MULTIPLIER := 1.2
 
 var weapon_index := 0
 var weapon_timers: Array[Timer] = []
@@ -99,6 +101,11 @@ func handle_controls(delta: float):
 	# Flat movement
 	var input = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var movement := Vector3(input.x, 0, input.y).limit_length(1.0) * movement_speed
+	
+	# Apply run multiplier if moving forward
+	if movement.z < 0.0:
+		movement.z *= RUN_MULTIPLIER
+	
 	movement.y = velocity.y
 	velocity = transform.basis * movement
 	
