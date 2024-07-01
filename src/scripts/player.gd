@@ -69,8 +69,9 @@ func _physics_process(delta: float):
 	if position.y < -10:
 		died.emit()
 	
+	var rotated_velocity = velocity * basis
 	weapon_container.position = lerp(
-		weapon_container.position, WEAPON_CONTAINER_OFFSET - (velocity / 30), delta * 10
+		weapon_container.position, WEAPON_CONTAINER_OFFSET - (rotated_velocity / 30), delta * 10
 	)
 	
 	# Movement sound
