@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://biqtga8moh7ah"
-path="res://.godot/imported/lilita_one_regular.ttf-76e106e61a026a0581a7618be3367159.fontdata"
+uid="uid://3ptnp51wg5qt"
+path="res://.godot/imported/victor_mono_medium.ttf-4a5ec579571d7e41327bd54b401bfa5d.fontdata"
 
 [deps]
 
-source_file="res://assets/fonts/lilita_one_regular.ttf"
-dest_files=["res://.godot/imported/lilita_one_regular.ttf-76e106e61a026a0581a7618be3367159.fontdata"]
+source_file="res://assets/fonts/victor_mono_medium.ttf"
+dest_files=["res://.godot/imported/victor_mono_medium.ttf-4a5ec579571d7e41327bd54b401bfa5d.fontdata"]
 
 [params]
 
