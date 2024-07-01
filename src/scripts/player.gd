@@ -69,21 +69,18 @@ func _physics_process(delta: float):
 	if position.y < -10:
 		died.emit()
 	
+	# Weapon sway
 	var rotated_velocity = velocity * basis
 	weapon_container.position = lerp(
 		weapon_container.position, WEAPON_CONTAINER_OFFSET - (rotated_velocity / 30), delta * 10
 	)
 	
 	# Movement sound
-	sound_footsteps.stream_paused = true
+	var play_walk_sound = self.is_on_floor() and (abs(velocity.x) > 1 or abs(velocity.z) > 1)
+	sound_footsteps.stream_paused = not play_walk_sound
 	
-	if self.is_on_floor():
-		var trigger_footsteps = abs(velocity.x) > 1 or abs(velocity.z) > 1
-		if trigger_footsteps:
-			sound_footsteps.stream_paused = false
-	
-	if self.is_on_floor() and velocity.y > 1 and !previously_floored:
-		Audio.play_at("land.ogg")
+	if self.is_on_floor() and velocity.y < 0.5 and !previously_floored:
+		Audio.play_at("land.ogg", +12)
 	previously_floored = self.is_on_floor()
 
 

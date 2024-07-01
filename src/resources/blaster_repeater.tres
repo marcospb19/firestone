@@ -13,5 +13,5 @@ muzzle_position = Vector3(0.1, -0.4, 1.5)
 firerate = 800.0
 damage = 9.0
 fire_sound = ExtResource("4_i70yh")
-volume_adjust = -2
+volume_adjust = -5
 crosshair_texture = ExtResource("1_448pk")

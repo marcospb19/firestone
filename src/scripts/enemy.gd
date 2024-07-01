@@ -20,7 +20,7 @@ func _process(delta: float):
 ## Take damage from another source
 ## @return: did this damage kill?
 func damage(amount: int) -> bool:
-	Audio.play_at("enemy_hurt.ogg")
+	Audio.play_at("enemy_hurt.ogg", -3)
 	health -= amount
 	
 	if health > 0 or already_dead:
