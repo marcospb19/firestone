@@ -209,7 +209,7 @@ func change_weapon():
 func damage(amount: int):
 	health -= amount
 	ui.update_player_health(health)
-	if health < 0:
+	if health <= 0:
 		died.emit()
 
 
