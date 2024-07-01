@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://hqqwpcluhpjc"]
+
+[ext_resource type="Texture2D" uid="uid://12ikpy3vvdwj" path="res://assets/textures/prototype-grid/orange-grid.png" id="1_kqvcf"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uuwjn"]
+albedo_color = Color(0.423529, 1, 1, 1)
+albedo_texture = ExtResource("1_kqvcf")
+uv1_triplanar = true
+uv1_world_triplanar = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w1irb"]
+albedo_color = Color(0.423529, 1, 1, 1)
+albedo_texture = ExtResource("1_kqvcf")
+uv1_triplanar = true
+uv1_world_triplanar = true
+
+[node name="ContainerHalfOpen" type="CSGBox3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+size = Vector3(3, 4, 7)
+material = SubResource("StandardMaterial3D_uuwjn")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.5)
+operation = 2
+size = Vector3(2, 3, 7)
+material = SubResource("StandardMaterial3D_w1irb")

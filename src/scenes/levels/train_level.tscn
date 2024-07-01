@@ -1,15 +1,88 @@
-[gd_scene load_steps=4 format=3 uid="uid://ctqae8e73sa1w"]
+[gd_scene load_steps=8 format=3 uid="uid://ctqae8e73sa1w"]
 
 [ext_resource type="PackedScene" uid="uid://dch0wy1f03eim" path="res://src/scenes/environment.tscn" id="1_e2l1x"]
-[ext_resource type="PackedScene" uid="uid://dl2ed4gkybggf" path="res://src/scenes/player.tscn" id="2_j2bnf"]
-[ext_resource type="PackedScene" uid="uid://dpm3l05d7fu35" path="res://src/scenes/platform.tscn" id="3_rh5fi"]
+[ext_resource type="PackedScene" uid="uid://bm8usyqlqf2aj" path="res://src/scenes/objects/floor.tscn" id="1_ftakv"]
+[ext_resource type="PackedScene" uid="uid://dl2ed4gkybggf" path="res://src/scenes/entities/player.tscn" id="2_j2bnf"]
+[ext_resource type="PackedScene" uid="uid://cfltfkmumxr0p" path="res://src/scenes/objects/container_closed.tscn" id="4_aukpy"]
+[ext_resource type="PackedScene" uid="uid://hqqwpcluhpjc" path="res://src/scenes/objects/container_half_open.tscn" id="5_uheab"]
+[ext_resource type="PackedScene" uid="uid://d0nqcd05ww8yx" path="res://src/scenes/objects/container_open.tscn" id="6_g4syy"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n01q4"]
+transparency = 1
+albedo_color = Color(1, 1, 1, 0.12549)
 
 [node name="TrainLevel" type="Node3D"]
 
 [node name="Environment" parent="." instance=ExtResource("1_e2l1x")]
+transform = Transform3D(-0.707107, 0.541675, -0.45452, 3.64017e-09, 0.642788, 0.766044, 0.707107, 0.541675, -0.45452, 0, 0, 0)
 
 [node name="Player" parent="." instance=ExtResource("2_j2bnf")]
-transform = Transform3D(-0.145548, 0, 0.989351, 0, 1, 0, -0.989351, 0, -0.145548, 0, 1.16187, 0)
 
-[node name="platform" parent="." instance=ExtResource("3_rh5fi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.48353, 0)
+[node name="Map" type="Node3D" parent="."]
+
+[node name="Objects" type="CSGCombiner3D" parent="Map"]
+use_collision = true
+
+[node name="Floor" parent="Map/Objects" instance=ExtResource("1_ftakv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.505, 0)
+
+[node name="ContainerClosed" parent="Map/Objects" instance=ExtResource("4_aukpy")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 5, 1.5, 3)
+
+[node name="ContainerClosed2" parent="Map/Objects" instance=ExtResource("4_aukpy")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 5, 1.5, 6)
+
+[node name="ContainerClosed4" parent="Map/Objects" instance=ExtResource("4_aukpy")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -5, 1.5, 6)
+
+[node name="ContainerClosed5" parent="Map/Objects" instance=ExtResource("4_aukpy")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -5, 1.5, -6)
+
+[node name="ContainerClosed7" parent="Map/Objects" instance=ExtResource("4_aukpy")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 5, 1.5, -6)
+
+[node name="ContainerClosed8" parent="Map/Objects" instance=ExtResource("4_aukpy")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 5, 1.5, -3)
+
+[node name="ContainerOpen" parent="Map/Objects" instance=ExtResource("6_g4syy")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -6.625, 5.01, 4.125)
+
+[node name="ContainerOpen2" parent="Map/Objects" instance=ExtResource("6_g4syy")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 3.75, 5.01, -3.625)
+
+[node name="ContainerHalfOpen" parent="Map/Objects" instance=ExtResource("5_uheab")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -5, 1.5, 3)
+
+[node name="ContainerHalfOpen2" parent="Map/Objects" instance=ExtResource("5_uheab")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -5, 1.5, -3)
+
+[node name="ContainerHalfOpen3" parent="Map/Objects" instance=ExtResource("5_uheab")]
+transform = Transform3D(3.78552e-08, -0.5, -0.866025, -2.18557e-08, -0.866025, 0.5, -1, 0, -4.37114e-08, 13, -0.5, 14)
+
+[node name="ContainerOpen3" parent="Map/Objects" instance=ExtResource("6_g4syy")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 1.5, 14)
+
+[node name="ContainerOpen4" parent="Map/Objects" instance=ExtResource("6_g4syy")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 1.5, -14)
+
+[node name="ContainerOpen5" parent="Map/Objects" instance=ExtResource("6_g4syy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 1.5, 0)
+
+[node name="ContainerOpen6" parent="Map/Objects" instance=ExtResource("6_g4syy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1.5, 0)
+
+[node name="Rest" type="CSGCombiner3D" parent="Map"]
+use_collision = true
+
+[node name="ForceFieldOuter" type="CSGBox3D" parent="Map/Rest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 0)
+size = Vector3(35, 35, 35)
+material = SubResource("StandardMaterial3D_n01q4")
+
+[node name="ForceFieldInner" type="CSGBox3D" parent="Map/Rest/ForceFieldOuter"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+operation = 2
+size = Vector3(34, 35, 34)
+material = SubResource("StandardMaterial3D_n01q4")
+
+[node name="TodoSpawnPoints" type="Node3D" parent="Map"]

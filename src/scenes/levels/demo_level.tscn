@@ -1,13 +1,13 @@
 [gd_scene load_steps=9 format=3 uid="uid://dxvvlck8lej3f"]
 
 [ext_resource type="Script" path="res://src/scripts/demo_level.gd" id="1_rttgd"]
-[ext_resource type="PackedScene" uid="uid://dl2ed4gkybggf" path="res://src/scenes/player.tscn" id="2_elriq"]
+[ext_resource type="PackedScene" uid="uid://dl2ed4gkybggf" path="res://src/scenes/entities/player.tscn" id="2_elriq"]
 [ext_resource type="PackedScene" uid="uid://dch0wy1f03eim" path="res://src/scenes/environment.tscn" id="2_k38af"]
-[ext_resource type="PackedScene" uid="uid://dpm3l05d7fu35" path="res://src/scenes/platform.tscn" id="5_3s40e"]
-[ext_resource type="PackedScene" uid="uid://r7rt7pth4u7o" path="res://src/scenes/wall_low.tscn" id="5_6vel1"]
-[ext_resource type="PackedScene" uid="uid://c71evdjblk5wp" path="res://src/scenes/wall_high.tscn" id="7_cabne"]
-[ext_resource type="PackedScene" uid="uid://bvx5cvigosg0s" path="res://src/scenes/platform_large_grass.tscn" id="7_wggef"]
-[ext_resource type="PackedScene" uid="uid://d2g78tpqbyf5g" path="res://src/scenes/enemy.tscn" id="8_7ty2f"]
+[ext_resource type="PackedScene" uid="uid://dpm3l05d7fu35" path="res://src/scenes/objects/platform.tscn" id="5_3s40e"]
+[ext_resource type="PackedScene" uid="uid://r7rt7pth4u7o" path="res://src/scenes/objects/wall_low.tscn" id="5_6vel1"]
+[ext_resource type="PackedScene" uid="uid://c71evdjblk5wp" path="res://src/scenes/objects/wall_high.tscn" id="7_cabne"]
+[ext_resource type="PackedScene" uid="uid://bvx5cvigosg0s" path="res://src/scenes/objects/platform_large_grass.tscn" id="7_wggef"]
+[ext_resource type="PackedScene" uid="uid://d2g78tpqbyf5g" path="res://src/scenes/entities/enemy.tscn" id="8_7ty2f"]
 
 [node name="DemoLevel" type="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5788, 4.51965, -5.70257)
