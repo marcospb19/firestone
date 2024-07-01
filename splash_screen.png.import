@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ce3lgq7foiusl"
-path="res://.godot/imported/crosshair-repeater.png-aa89d72593bcda560a11d6932145f14c.ctex"
+uid="uid://biff4dkpfqi47"
+path="res://.godot/imported/splash_screen.png-c4325b211491e80389593ab522aa4a51.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/crosshair-repeater.png"
-dest_files=["res://.godot/imported/crosshair-repeater.png-aa89d72593bcda560a11d6932145f14c.ctex"]
+source_file="res://splash_screen.png"
+dest_files=["res://.godot/imported/splash_screen.png-c4325b211491e80389593ab522aa4a51.ctex"]
 
 [params]
 

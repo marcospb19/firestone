@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://lde2xq3vq635"
-path="res://.godot/imported/enemy-flying.glb-dbcdb1b15c7d65b364ab6be405fbe845.scn"
+uid="uid://c743irj356lax"
+path="res://.godot/imported/wall_high.glb-40f46a3b28a1628c233fc5a88971ef1c.scn"
 
 [deps]
 
-source_file="res://assets/models/enemy-flying.glb"
-dest_files=["res://.godot/imported/enemy-flying.glb-dbcdb1b15c7d65b364ab6be405fbe845.scn"]
+source_file="res://assets/models/wall_high.glb"
+dest_files=["res://.godot/imported/wall_high.glb-40f46a3b28a1628c233fc5a88971ef1c.scn"]
 
 [params]
 

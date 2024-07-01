@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="Weapon" load_steps=5 format=3 uid="uid://cu2gtxlcmbb34"]
 
-[ext_resource type="Texture2D" uid="uid://ogyonerhuxqq" path="res://assets/sprites/new-crosshair.png" id="1_448pk"]
-[ext_resource type="PackedScene" uid="uid://dd3oln1ucgqpd" path="res://assets/models/blaster-repeater.glb" id="2_f3kcv"]
+[ext_resource type="Texture2D" uid="uid://ogyonerhuxqq" path="res://assets/sprites/new_crosshair.png" id="1_448pk"]
+[ext_resource type="PackedScene" uid="uid://dd3oln1ucgqpd" path="res://assets/models/blaster_repeater.glb" id="2_f3kcv"]
 [ext_resource type="AudioStream" uid="uid://csdsvg0nh35id" path="res://assets/sounds/blaster_repeater.ogg" id="4_i70yh"]
 [ext_resource type="Script" path="res://src/scripts/resources/weapon_resource.gd" id="4_k4as2"]
 

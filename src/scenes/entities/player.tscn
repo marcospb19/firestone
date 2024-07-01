@@ -1,7 +1,7 @@
 [gd_scene load_steps=10 format=3 uid="uid://dl2ed4gkybggf"]
 
 [ext_resource type="Script" path="res://src/scripts/player.gd" id="1_ffboj"]
-[ext_resource type="Resource" uid="uid://cu2gtxlcmbb34" path="res://src/resources/blaster-repeater.tres" id="2_6epbw"]
+[ext_resource type="Resource" uid="uid://cu2gtxlcmbb34" path="res://src/resources/blaster_repeater.tres" id="2_6epbw"]
 [ext_resource type="Texture2D" uid="uid://8ggihh27mlrr" path="res://assets/sprites/blob_shadow.png" id="2_b0fo8"]
 [ext_resource type="Resource" uid="uid://c56y8pqoyk15f" path="res://src/resources/blaster.tres" id="3_kr4p8"]
 [ext_resource type="Script" path="res://src/scripts/camera.gd" id="4_g8ff7"]

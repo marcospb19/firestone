@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://d0nqcd05ww8yx"]
 
-[ext_resource type="Texture2D" uid="uid://12ikpy3vvdwj" path="res://assets/textures/prototype-grid/orange-grid.png" id="1_034v5"]
+[ext_resource type="Texture2D" uid="uid://12ikpy3vvdwj" path="res://assets/textures/prototype_grid/orange_grid.png" id="1_034v5"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_miwxh"]
 albedo_color = Color(0.99, 0.98109, 0.7227, 1)

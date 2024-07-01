@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://k065rxqtim8f"
-path="res://.godot/imported/platform-large-grass.glb-075e84190595bccbad4432e9fab96dcc.scn"
+uid="uid://lde2xq3vq635"
+path="res://.godot/imported/enemy_flying.glb-230e8493d953d696efa2e4d94ab93a4d.scn"
 
 [deps]
 
-source_file="res://assets/models/platform-large-grass.glb"
-dest_files=["res://.godot/imported/platform-large-grass.glb-075e84190595bccbad4432e9fab96dcc.scn"]
+source_file="res://assets/models/enemy_flying.glb"
+dest_files=["res://.godot/imported/enemy_flying.glb-230e8493d953d696efa2e4d94ab93a4d.scn"]
 
 [params]
 

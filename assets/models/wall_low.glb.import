@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://das5fosq6auoe"
-path="res://.godot/imported/grass-small.glb-df4f67850f3dc8b5ab17507d08fae65e.scn"
+uid="uid://x08pt5dvke58"
+path="res://.godot/imported/wall_low.glb-926358fcef0a0dbe1bf194a7d5a831f0.scn"
 
 [deps]
 
-source_file="res://assets/models/grass-small.glb"
-dest_files=["res://.godot/imported/grass-small.glb-df4f67850f3dc8b5ab17507d08fae65e.scn"]
+source_file="res://assets/models/wall_low.glb"
+dest_files=["res://.godot/imported/wall_low.glb-926358fcef0a0dbe1bf194a7d5a831f0.scn"]
 
 [params]
 

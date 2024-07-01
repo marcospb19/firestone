@@ -40,7 +40,7 @@ func hitmarker_tween_settings(killed: bool) -> Dictionary:
 	if killed:
 		return {
 			"from": Color.RED * 17,
-			"texture": load("res://assets/sprites/double-hitmarker.png"),
+			"texture": load("res://assets/sprites/double_hitmarker.png"),
 			"duration": 2.5,
 			"marker_scale": 0.7,
 			"to": Color.BLACK * 0.8 + Color.TRANSPARENT * 0.2,
@@ -49,7 +49,7 @@ func hitmarker_tween_settings(killed: bool) -> Dictionary:
 	else:
 		return {
 			"from": Color.WHITE * 10,
-			"texture": load("res://assets/sprites/single-hitmarker.png"),
+			"texture": load("res://assets/sprites/single_hitmarker.png"),
 			"duration": 1.0,
 			"marker_scale": 0.55,
 			"to": Color.TRANSPARENT,

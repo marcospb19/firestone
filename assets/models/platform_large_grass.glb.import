@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dd3oln1ucgqpd"
-path="res://.godot/imported/blaster-repeater.glb-25d865dbd42be439c1a6ae2a67f54d24.scn"
+uid="uid://k065rxqtim8f"
+path="res://.godot/imported/platform_large_grass.glb-b18ac07b23cd649b5c4c503e7edcaf6d.scn"
 
 [deps]
 
-source_file="res://assets/models/blaster-repeater.glb"
-dest_files=["res://.godot/imported/blaster-repeater.glb-25d865dbd42be439c1a6ae2a67f54d24.scn"]
+source_file="res://assets/models/platform_large_grass.glb"
+dest_files=["res://.godot/imported/platform_large_grass.glb-b18ac07b23cd649b5c4c503e7edcaf6d.scn"]
 
 [params]
 

@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://c743irj356lax"
-path="res://.godot/imported/wall-high.glb-1cc502b3ccf0f06eb6cd690d41d0b1f9.scn"
+uid="uid://dd3oln1ucgqpd"
+path="res://.godot/imported/blaster_repeater.glb-48814ff35d910ce26c351cdebd422200.scn"
 
 [deps]
 
-source_file="res://assets/models/wall-high.glb"
-dest_files=["res://.godot/imported/wall-high.glb-1cc502b3ccf0f06eb6cd690d41d0b1f9.scn"]
+source_file="res://assets/models/blaster_repeater.glb"
+dest_files=["res://.godot/imported/blaster_repeater.glb-48814ff35d910ce26c351cdebd422200.scn"]
 
 [params]
 

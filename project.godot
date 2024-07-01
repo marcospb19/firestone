@@ -16,7 +16,7 @@ run/main_scene="res://src/scenes/ui/main_menu.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
 run/max_fps=1000
 boot_splash/bg_color=Color(0.92549, 0.92549, 0.960784, 1)
-boot_splash/image="res://splash-screen.png"
+boot_splash/image="res://splash_screen.png"
 config/icon="res://icon.png"
 run/physics_ticks_per_second=1000
 
