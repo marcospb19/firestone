@@ -76,4 +76,3 @@ normal_fade = 0.5
 [node name="SoundFootsteps" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("5_ics1s")
 volume_db = -5.0
-autoplay = true
