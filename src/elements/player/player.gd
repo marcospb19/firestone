@@ -23,7 +23,7 @@ const RUN_MULTIPLIER := 1.2
 var weapon_index := 0
 var weapon_timers: Array[Timer] = []
 
-var mouse_sensitivity := 0.0008
+var mouse_sensitivity := 0.00065
 var gamepad_sensitivity := 0.075
 
 var health := 100

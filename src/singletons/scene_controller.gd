@@ -1,20 +1,20 @@
 extends Node
 
-const MAIN_SCENE_GROUP := "main_scene"
+const MAIN_SCENE_GROUP_NAME := "main_scene"
 
 enum MainScene {
 	MAIN_MENU,
-	LEVEL_DEMO,
-	LEVEL_TRAIN,
+	CONTAINERS_LEVEL,
+	PLATFORMS_LEVEL,
 }
 
 const SCENE_PATHS := {
 	MainScene.MAIN_MENU: "res://src/elements/ui/menus/main_menu.tscn",
-	MainScene.LEVEL_DEMO: "res://src/elements/levels/demo_level.tscn",
-	MainScene.LEVEL_TRAIN: "res://src/elements/levels/train_level.tscn",
+	MainScene.CONTAINERS_LEVEL: "res://src/elements/levels/containers_level.tscn",
+	MainScene.PLATFORMS_LEVEL: "res://src/elements/levels/platforms_level.tscn",
 }
 
-var last_loaded_scene: MainScene
+var last_loaded_scene_path: String
 
 
 func _ready():
@@ -23,20 +23,25 @@ func _ready():
 		assert(ResourceLoader.exists(path), "scene path doesn't exist: '%s'" % path)
 
 
-func load_and_set_scene(scene: MainScene):
-	self.get_tree().call_group(MAIN_SCENE_GROUP, "queue_free")
-	var node: Node = load(SCENE_PATHS[scene]).instantiate()
-	node.add_to_group(MAIN_SCENE_GROUP)
-	self.get_tree().root.add_child(node)
-	last_loaded_scene = scene
-
-
-func go_to_main_menu():
-	load_and_set_scene(MainScene.MAIN_MENU)
+func switch_to(scene: MainScene):
+	var path = SCENE_PATHS[scene]
+	__switch_to_scene_at(path)
+	last_loaded_scene_path = path
 
 
 func reload_current_scene():
-	load_and_set_scene(last_loaded_scene)
+	__switch_to_scene_at(last_loaded_scene_path)
+
+
+func __switch_to_scene_at(path: String):
+	self.get_tree().call_group(MAIN_SCENE_GROUP_NAME, "queue_free")
+	var node: Node = load(path).instantiate()
+	node.add_to_group(MAIN_SCENE_GROUP_NAME)
+	self.get_tree().root.add_child(node)
+
+
+func go_to_main_menu():
+	switch_to(MainScene.MAIN_MENU)
 
 
 func quit():
