@@ -14,8 +14,25 @@ pub struct Simulation {
     components: HashMap<usize, Component>,
     supergraph: GraphMap<usize, SupergraphEdgeKind, Directed>,
     subgraph: Acyclic<GraphMap<usize, (), Directed>>,
-    inputs: HashMap<usize, bool>, // state
+    inputs: HashMap<usize, State>, // state
     id_gen: usize,
+    version_gen: u64,
+}
+
+#[derive(Clone, Copy)]
+struct State {
+    value: bool,
+    version: u64,
+}
+
+impl State {
+    fn new(value: bool) -> Self {
+        Self { value, version: 0 }
+    }
+
+    fn versioned(value: bool, version: u64) -> State {
+        Self { value, version }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIs)]
@@ -36,7 +53,7 @@ impl Simulation {
             self.subgraph.add_node(id);
         }
 
-        self.inputs.insert(id, false);
+        self.inputs.insert(id, State::new(false));
         id
     }
 
@@ -113,16 +130,21 @@ impl Simulation {
     }
 
     pub fn run_step(&mut self) {
+        self.version_gen += 1;
+        let version = self.version_gen;
+
         // tick all delays, and for all edge starting from a delay, set child input
         if let edits = self
             .supergraph
             .all_edges()
             .filter(|(_, _, edge_kind)| !edge_kind.is_enters_supergraph())
-            .map(|(parent, child, _)| (child, self.inputs[&parent]))
+            .map(|(parent, child, _)| (child, self.inputs[&parent].value))
             .collect::<Vec<_>>()
         {
-            for (child, new_child_val) in edits {
-                let previously_set = self.inputs.insert(child, new_child_val);
+            for (child, new_child_value) in edits {
+                let previously_set = self
+                    .inputs
+                    .insert(child, State::versioned(new_child_value, version));
                 assert!(previously_set.is_some());
             }
         }
@@ -131,48 +153,48 @@ impl Simulation {
         let leaves = self.subgraph_leaves().collect::<Vec<usize>>();
         for leaf in leaves {
             assert!(!self.components[&leaf].is_delay());
-            let value = self.eval_and_update(leaf);
+            let value = self.recursive_eval_and_update(leaf, version);
 
             // update input of all touched delays
             for (_, child, &edge_kind) in self.supergraph.edges_directed(leaf, Outgoing) {
                 assert_eq!(edge_kind, SupergraphEdgeKind::EntersSupergraph);
-                self.inputs.insert(child, value);
+                self.inputs.insert(child, State::versioned(value, version));
             }
         }
     }
 
-    fn eval_and_update(&mut self, node: usize) -> bool {
+    fn recursive_eval_and_update(&mut self, node: usize, version: u64) -> bool {
         let component = self.components[&node];
         let parent = component.parent();
 
-        let parent_output = 'parent_eval: {
+        let updated_input = 'updated_input: {
+            let input = self.inputs[&node];
+
+            if input.version == version {
+                break 'updated_input input.value;
+            }
+
             let Some(parent) = parent else {
-                break 'parent_eval false;
+                break 'updated_input false;
             };
 
             match self.components[&parent].kind() {
-                ComponentKind::Not => self.eval_and_update(parent),
-                ComponentKind::Delay => self.inputs[&node],
+                ComponentKind::Not => self.recursive_eval_and_update(parent, version),
+                ComponentKind::Delay => unreachable!("checked in `version`"),
             }
         };
 
-        self.inputs.insert(node, parent_output);
+        self.inputs
+            .insert(node, State::versioned(updated_input, version));
 
-        let node_output = match component.kind() {
-            ComponentKind::Not => !parent_output,
+        match component.kind() {
+            ComponentKind::Not => !updated_input,
             ComponentKind::Delay => unreachable!(),
-        };
-
-        node_output
+        }
     }
 
     pub fn get_input(&self, id: usize) -> bool {
-        self.inputs[&id]
-    }
-
-    pub fn set_input(&mut self, id: usize, value: bool) {
-        let previous = self.inputs.insert(id, value);
-        assert!(previous.is_some(), "set_input of unknown {id}");
+        self.inputs[&id].value
     }
 
     fn subgraph_leaves(&self) -> impl Iterator<Item = usize> {
@@ -184,6 +206,16 @@ impl Simulation {
         };
 
         self.subgraph.nodes().filter(is_leaf)
+    }
+
+    #[cfg(test)]
+    pub fn set_input(&mut self, id: usize, value: bool) {
+        let previous = self.inputs.insert(id, State::new(value));
+        assert!(previous.is_some(), "set_input of unknown {id}");
+        assert!(
+            previous.is_some_and(|previous| previous.version == 0),
+            "messed up version of `set_input`",
+        );
     }
 }
 
