@@ -1,46 +1,54 @@
 #![feature(array_windows)]
 #![allow(irrefutable_let_patterns)]
 
-use self::Component::*;
-use petgraph::{Directed, acyclic::Acyclic, data::Build, prelude::GraphMap};
-use std::{
-    array,
-    collections::{HashMap, HashSet, VecDeque},
+use petgraph::{
+    acyclic::Acyclic,
+    data::Build,
+    prelude::{Directed, Direction::Outgoing, GraphMap},
 };
+use std::{array, collections::HashMap};
+use strum::EnumIs;
 
 #[derive(Default)]
 pub struct Simulation {
     components: HashMap<usize, Component>,
-    supergraph: GraphMap<usize, bool, Directed>,
-    subgraph: Acyclic<GraphMap<usize, bool, Directed>>,
-    subgraph_incoming_count: HashMap<usize, usize>,
-    // instead of tracking state of each component, only track the input
-    inputs: HashMap<usize, bool>,
+    supergraph: GraphMap<usize, SupergraphEdgeKind, Directed>,
+    subgraph: Acyclic<GraphMap<usize, (), Directed>>,
+    inputs: HashMap<usize, bool>, // state
     id_gen: usize,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIs)]
+enum SupergraphEdgeKind {
+    EntersSupergraph,
+    Internal,
+    ExitsSupergraph,
+}
+
 impl Simulation {
-    pub fn add(&mut self, kind: Component) -> usize {
+    pub fn add(&mut self, kind: ComponentKind) -> usize {
         let id = self.id_gen;
         self.id_gen += 1;
-        self.components.insert(id, kind);
+        self.components.insert(id, Component::from(kind));
 
         self.supergraph.add_node(id);
-        self.subgraph.add_node(id);
+        if !kind.is_delay() {
+            self.subgraph.add_node(id);
+        }
 
         self.inputs.insert(id, false);
         id
     }
 
-    pub fn add_array<const N: usize>(&mut self, array: [Component; N]) -> [usize; N] {
+    pub fn add_array<const N: usize>(&mut self, array: [ComponentKind; N]) -> [usize; N] {
         array.map(|component| self.add(component))
     }
 
-    pub fn add_array_of<const N: usize>(&mut self, component: Component) -> [usize; N] {
+    pub fn add_array_of<const N: usize>(&mut self, component: ComponentKind) -> [usize; N] {
         array::from_fn(|_| self.add(component))
     }
 
-    pub fn add_array_wired<const N: usize>(&mut self, array: [Component; N]) -> [usize; N] {
+    pub fn add_array_wired<const N: usize>(&mut self, array: [ComponentKind; N]) -> [usize; N] {
         let components = self.add_array(array);
         for &[parent, child] in components.array_windows::<2>() {
             self.wire(parent, child);
@@ -48,7 +56,7 @@ impl Simulation {
         components
     }
 
-    pub fn add_array_wired_of<const N: usize>(&mut self, component: Component) -> [usize; N] {
+    pub fn add_array_wired_of<const N: usize>(&mut self, component: ComponentKind) -> [usize; N] {
         let components = self.add_array_of(component);
         for &[parent, child] in components.array_windows::<2>() {
             self.wire(parent, child);
@@ -56,7 +64,10 @@ impl Simulation {
         components
     }
 
-    pub fn add_array_wired_loop<const N: usize>(&mut self, array: [Component; N]) -> [usize; N] {
+    pub fn add_array_wired_loop<const N: usize>(
+        &mut self,
+        array: [ComponentKind; N],
+    ) -> [usize; N] {
         let components = self.add_array_wired(array);
         if let Some((&first, &last)) = components.first().zip(components.last()) {
             self.wire(last, first); // close the loop
@@ -64,8 +75,11 @@ impl Simulation {
         components
     }
 
-    pub fn add_array_wired_loop_of<const N: usize>(&mut self, component: Component) -> [usize; N] {
-        let components = self.add_array_of(component);
+    pub fn add_array_wired_loop_of<const N: usize>(
+        &mut self,
+        component: ComponentKind,
+    ) -> [usize; N] {
+        let components = self.add_array_wired_of(component);
         if let Some((&first, &last)) = components.first().zip(components.last()) {
             self.wire(last, first); // close the loop
         }
@@ -73,74 +87,151 @@ impl Simulation {
     }
 
     pub fn wire(&mut self, parent: usize, child: usize) {
-        let parent_kind = self.components.get(&parent).expect("unexpected parent");
-        let child_kind = self.components.get(&child).expect("unexpected parent");
+        let parent_component = self.components.get(&parent).expect("unexpected parent");
+        let child_component = self.components.get(&child).expect("unexpected parent");
 
-        if parent_kind.is_delay() {
-            self.supergraph
-                .add_edge(parent, child, !child_kind.is_delay());
+        let edge_kind = match (parent_component.is_delay(), child_component.is_delay()) {
+            (false, true) => Some(SupergraphEdgeKind::EntersSupergraph),
+            (true, true) => Some(SupergraphEdgeKind::Internal),
+            (true, false) => Some(SupergraphEdgeKind::ExitsSupergraph),
+            (false, false) => None,
+        };
+
+        if let Some(edge_kind) = edge_kind {
+            self.supergraph.add_edge(parent, child, edge_kind);
         } else {
             self.subgraph
-                .try_add_edge(parent, child, child_kind.is_delay())
+                .try_add_edge(parent, child, ())
                 .expect("found cycle");
-            *self.subgraph_incoming_count.entry(child).or_default() += 1;
         }
+
+        *self
+            .components
+            .get_mut(&child)
+            .expect("unexpected parent")
+            .parent_mut() = Some(parent);
     }
 
     pub fn run_step(&mut self) {
-        if let previous_state = self.inputs.clone() {
-            for (parent, child, _) in self.supergraph.all_edges() {
-                self.inputs.insert(child, previous_state[&parent]);
+        // tick all delays, and for all edge starting from a delay, set child input
+        if let edits = self
+            .supergraph
+            .all_edges()
+            .filter(|(_, _, edge_kind)| !edge_kind.is_enters_supergraph())
+            .map(|(parent, child, _)| (child, self.inputs[&parent]))
+            .collect::<Vec<_>>()
+        {
+            for (child, new_child_val) in edits {
+                let previously_set = self.inputs.insert(child, new_child_val);
+                assert!(previously_set.is_some());
             }
         }
 
-        let mut queue = self.subgraph_roots().collect::<VecDeque<usize>>();
-        let mut visited = HashSet::new();
+        // for all leaves, eval with recursion
+        let leaves = self.subgraph_leaves().collect::<Vec<usize>>();
+        for leaf in leaves {
+            assert!(!self.components[&leaf].is_delay());
+            let value = self.eval_and_update(leaf);
 
-        while let Some(node) = queue.pop_front() {
-            for (_, child, crosses_boundaries) in self.subgraph.edges(node) {
-                let Not = self.components[&node] else {
-                    unreachable!();
-                };
-                self.inputs.insert(child, !self.inputs[&node]);
-
-                assert!(!visited.contains(&child), "shouldn't visit twice");
-                visited.insert(child);
-
-                if !crosses_boundaries {
-                    queue.push_back(child);
-                }
+            // update input of all touched delays
+            for (_, child, &edge_kind) in self.supergraph.edges_directed(leaf, Outgoing) {
+                assert_eq!(edge_kind, SupergraphEdgeKind::EntersSupergraph);
+                self.inputs.insert(child, value);
             }
         }
+    }
+
+    fn eval_and_update(&mut self, node: usize) -> bool {
+        let component = self.components[&node];
+        let parent = component.parent();
+
+        let parent_output = 'parent_eval: {
+            let Some(parent) = parent else {
+                break 'parent_eval false;
+            };
+
+            match self.components[&parent].kind() {
+                ComponentKind::Not => self.eval_and_update(parent),
+                ComponentKind::Delay => self.inputs[&node],
+            }
+        };
+
+        self.inputs.insert(node, parent_output);
+
+        let node_output = match component.kind() {
+            ComponentKind::Not => !parent_output,
+            ComponentKind::Delay => unreachable!(),
+        };
+
+        node_output
     }
 
     pub fn get_input(&self, id: usize) -> bool {
         self.inputs[&id]
     }
 
-    #[track_caller]
     pub fn set_input(&mut self, id: usize, value: bool) {
         let previous = self.inputs.insert(id, value);
         assert!(previous.is_some(), "set_input of unknown {id}");
     }
 
-    fn subgraph_roots(&self) -> impl Iterator<Item = usize> {
-        self.subgraph.nodes().filter(|node| {
-            assert_ne!(Some(&0), self.subgraph_incoming_count.get(node));
-            !self.subgraph_incoming_count.contains_key(node)
-        })
+    fn subgraph_leaves(&self) -> impl Iterator<Item = usize> {
+        let is_leaf = |&node: &usize| {
+            self.subgraph
+                .edges_directed(node, Outgoing)
+                .next()
+                .is_none()
+        };
+
+        self.subgraph.nodes().filter(is_leaf)
     }
 }
 
-#[derive(Clone, Copy, strum::EnumIs)]
+#[derive(Clone, Copy, EnumIs)]
 pub enum Component {
-    And,
+    Not { parent: Option<usize> },
+    Delay { parent: Option<usize> },
+}
+
+impl Component {
+    pub fn parent(self) -> Option<usize> {
+        match self {
+            Component::Not { parent } | Component::Delay { parent } => parent,
+        }
+    }
+
+    pub fn parent_mut(&mut self) -> &mut Option<usize> {
+        match self {
+            Component::Not { parent } | Component::Delay { parent } => parent,
+        }
+    }
+
+    pub fn kind(self) -> ComponentKind {
+        match self {
+            Component::Not { .. } => ComponentKind::Not,
+            Component::Delay { .. } => ComponentKind::Delay,
+        }
+    }
+}
+
+#[derive(Clone, Copy, EnumIs)]
+pub enum ComponentKind {
     Not,
     Delay,
 }
 
+impl From<ComponentKind> for Component {
+    fn from(kind: ComponentKind) -> Self {
+        match kind {
+            ComponentKind::Not => Component::Not { parent: None },
+            ComponentKind::Delay => Component::Delay { parent: None },
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use super::ComponentKind::*;
     use super::*;
 
     #[test]
@@ -158,6 +249,16 @@ mod tests {
         let [v, u] = sim.add_array_of(Not);
         sim.wire(v, u);
         sim.wire(u, v);
+    }
+
+    #[test]
+    fn test_disconnected_components() {
+        let mut sim = Simulation::default();
+        let components = sim.add_array([Not, Not, Delay, Delay]);
+        for _ in 0..100 {
+            sim.run_step();
+            assert!(components.iter().all(|&id| !sim.get_input(id)));
+        }
     }
 
     #[test]
@@ -189,10 +290,34 @@ mod tests {
     }
 
     #[test]
-    fn test_loop_circuit_with_consecutive_delays_and_nots() {
+    fn test_loop_with_three_delays() {
         let mut sim = Simulation::default();
-        let [not_1, not_2, not_3, delay_1, delay_2, delay_3] =
-            sim.add_array_wired_loop([Not, Not, Not, Delay, Delay, Delay]);
+        let [delay_1, delay_2, delay_3] = sim.add_array_wired_loop_of(Delay);
+        sim.set_input(delay_1, true);
+
+        for _ in 0..100 {
+            sim.run_step();
+            assert!(!sim.get_input(delay_1));
+            assert!(sim.get_input(delay_2));
+            assert!(!sim.get_input(delay_3));
+
+            sim.run_step();
+            assert!(!sim.get_input(delay_1));
+            assert!(!sim.get_input(delay_2));
+            assert!(sim.get_input(delay_3));
+
+            sim.run_step();
+            assert!(sim.get_input(delay_1));
+            assert!(!sim.get_input(delay_2));
+            assert!(!sim.get_input(delay_3));
+        }
+    }
+
+    #[test]
+    fn test_loop_circuit_with_consecutive_nots_and_delays() {
+        let mut sim = Simulation::default();
+        let [not_1, not_2, not_3, delay_1, delay_2] =
+            sim.add_array_wired_loop([Not, Not, Not, Delay, Delay]);
 
         for _ in 0..100 {
             sim.run_step();
@@ -201,7 +326,6 @@ mod tests {
             assert!(!sim.get_input(not_3));
             assert!(sim.get_input(delay_1));
             assert!(!sim.get_input(delay_2));
-            assert!(!sim.get_input(delay_3));
 
             sim.run_step();
             assert!(!sim.get_input(not_1));
@@ -209,39 +333,37 @@ mod tests {
             assert!(!sim.get_input(not_3));
             assert!(sim.get_input(delay_1));
             assert!(sim.get_input(delay_2));
-            assert!(!sim.get_input(delay_3));
 
+            sim.run_step();
+            assert!(sim.get_input(not_1));
+            assert!(!sim.get_input(not_2));
+            assert!(sim.get_input(not_3));
+            assert!(!sim.get_input(delay_1));
+            assert!(sim.get_input(delay_2));
+
+            sim.run_step();
+            assert!(sim.get_input(not_1));
+            assert!(!sim.get_input(not_2));
+            assert!(sim.get_input(not_3));
+            assert!(!sim.get_input(delay_1));
+            assert!(!sim.get_input(delay_2));
+        }
+    }
+
+    #[test]
+    fn test_loop_circuit_with_consecutive_nots_and_delays_stable() {
+        let mut sim = Simulation::default();
+        let [not_1, not_2, not_3, not_4, delay_1, delay_2] =
+            sim.add_array_wired_loop([Not, Not, Not, Not, Delay, Delay]);
+
+        for _ in 0..100 {
             sim.run_step();
             assert!(!sim.get_input(not_1));
             assert!(sim.get_input(not_2));
             assert!(!sim.get_input(not_3));
-            assert!(sim.get_input(delay_1));
-            assert!(sim.get_input(delay_2));
-            assert!(sim.get_input(delay_3));
-
-            sim.run_step();
-            assert!(sim.get_input(not_1));
-            assert!(!sim.get_input(not_2));
-            assert!(sim.get_input(not_3));
-            assert!(!sim.get_input(delay_1));
-            assert!(sim.get_input(delay_2));
-            assert!(sim.get_input(delay_3));
-
-            sim.run_step();
-            assert!(sim.get_input(not_1));
-            assert!(!sim.get_input(not_2));
-            assert!(sim.get_input(not_3));
+            assert!(sim.get_input(not_4));
             assert!(!sim.get_input(delay_1));
             assert!(!sim.get_input(delay_2));
-            assert!(sim.get_input(delay_3));
-
-            sim.run_step();
-            assert!(sim.get_input(not_1));
-            assert!(!sim.get_input(not_2));
-            assert!(sim.get_input(not_3));
-            assert!(!sim.get_input(delay_1));
-            assert!(!sim.get_input(delay_2));
-            assert!(!sim.get_input(delay_3));
         }
     }
 }
