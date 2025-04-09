@@ -21,25 +21,6 @@ pub struct Simulation {
     eval_version: u64,
 }
 
-#[derive(Default, Clone, Copy)]
-struct State {
-    value: bool,
-    version: u64,
-}
-
-impl State {
-    fn new(value: bool, version: u64) -> State {
-        Self { value, version }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIs)]
-enum SupergraphEdgeKind {
-    EntersSupergraph,
-    Internal,
-    ExitsSupergraph,
-}
-
 impl Simulation {
     pub fn add(&mut self, kind: ComponentKind) -> Id {
         let id = self.id_gen.next_id();
@@ -220,6 +201,18 @@ impl Simulation {
     }
 }
 
+#[derive(Default, Clone, Copy)]
+struct State {
+    value: bool,
+    version: u64,
+}
+
+impl State {
+    fn new(value: bool, version: u64) -> State {
+        Self { value, version }
+    }
+}
+
 #[derive(Clone, Copy)]
 struct Component {
     state: State,
@@ -241,6 +234,13 @@ impl Component {
 pub enum ComponentKind {
     Not,
     Delay,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIs)]
+enum SupergraphEdgeKind {
+    EntersSupergraph,
+    Internal,
+    ExitsSupergraph,
 }
 
 #[cfg(test)]
