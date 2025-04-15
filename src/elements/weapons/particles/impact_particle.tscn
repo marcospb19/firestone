@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://b7070gfoko4mo"]
 
 [ext_resource type="Texture2D" uid="uid://dh0t42ubhuv0" path="res://assets/sprites/hit.png" id="1_ew286"]
-[ext_resource type="Script" path="res://src/elements/weapons/particles/impact_particle.gd" id="2_yw5i1"]
+[ext_resource type="Script" uid="uid://b6wo3bfc1gpq6" path="res://src/elements/weapons/particles/impact_particle.gd" id="2_yw5i1"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8c04i"]
 atlas = ExtResource("1_ew286")
