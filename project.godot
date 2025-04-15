@@ -12,12 +12,10 @@ config_version=5
 
 config/name="Starter Kit FPS"
 config/tags=PackedStringArray("starterkit")
-run/main_scene="res://src/elements/ui/menus/main_menu.tscn"
+run/main_scene="uid://ctqae8e73sa1w"
 config/features=PackedStringArray("4.4", "Forward Plus")
 run/max_fps=1000
 boot_splash/bg_color=Color(0.92549, 0.92549, 0.960784, 1)
-boot_splash/image="res://splash_screen.png"
-config/icon="res://icon.png"
 run/physics_ticks_per_second=1000
 
 [audio]
@@ -28,7 +26,7 @@ driver/output_latency=10
 
 Audio="*res://src/singletons/audio.gd"
 Utils="*res://src/singletons/utils.gd"
-SceneController="*res://src/singletons/scene_controller.gd"
+SceneController="*res://scene_controller.gd"
 
 [display]
 

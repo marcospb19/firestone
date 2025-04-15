@@ -1,0 +1,37 @@
+[gd_scene load_steps=8 format=3 uid="uid://ctqae8e73sa1w"]
+
+[ext_resource type="PackedScene" uid="uid://bm8usyqlqf2aj" path="res://floor.tscn" id="1_6xwvw"]
+[ext_resource type="PackedScene" uid="uid://dch0wy1f03eim" path="res://level_environment.tscn" id="2_28khi"]
+[ext_resource type="PackedScene" uid="uid://dl2ed4gkybggf" path="res://src/elements/player/player.tscn" id="3_i1mur"]
+[ext_resource type="Texture2D" uid="uid://38rtc8sllpi2" path="res://assets/black_grid.svg" id="4_cejrt"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fbvg1"]
+size = Vector3(64, 1, 64)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rlqap"]
+albedo_texture = ExtResource("4_cejrt")
+uv1_triplanar = true
+uv1_world_triplanar = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_bme8u"]
+material = SubResource("StandardMaterial3D_rlqap")
+size = Vector3(64, 1, 64)
+
+[node name="Plane" type="Node3D"]
+
+[node name="Floor" parent="." instance=ExtResource("1_6xwvw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.505, 0)
+
+[node name="Environment" parent="." instance=ExtResource("2_28khi")]
+transform = Transform3D(-0.707107, 0.541675, -0.45452, 3.64017e-09, 0.642788, 0.766044, 0.707107, 0.541675, -0.45452, 0, 0, 0)
+
+[node name="Player" parent="." instance=ExtResource("3_i1mur")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.52745, 0)
+
+[node name="Floor2" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor2"]
+shape = SubResource("BoxShape3D_fbvg1")
+
+[node name="CSGMesh3D" type="CSGMesh3D" parent="Floor2"]
+mesh = SubResource("BoxMesh_bme8u")

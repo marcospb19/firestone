@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://2jld33y6h5pq"
-path.s3tc="res://.godot/imported/crosshair.png-9da9840bf8a975d7bc56e2a98b32a83b.s3tc.ctex"
+uid="uid://38rtc8sllpi2"
+path.s3tc="res://.godot/imported/black_grid.svg-853ca54d961b05ebb44c3a99042f8059.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/sprites/crosshair.png"
-dest_files=["res://.godot/imported/crosshair.png-9da9840bf8a975d7bc56e2a98b32a83b.s3tc.ctex"]
+source_file="res://assets/black_grid.svg"
+dest_files=["res://.godot/imported/black_grid.svg-853ca54d961b05ebb44c3a99042f8059.s3tc.ctex"]
 
 [params]
 
@@ -33,3 +33,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=0
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

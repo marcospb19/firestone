@@ -1,23 +1,16 @@
-[gd_scene load_steps=11 format=3 uid="uid://dl2ed4gkybggf"]
+[gd_scene load_steps=6 format=3 uid="uid://dl2ed4gkybggf"]
 
 [ext_resource type="Script" uid="uid://b6ct8sacwqxku" path="res://src/elements/player/player.gd" id="1_ffboj"]
-[ext_resource type="Resource" uid="uid://cu2gtxlcmbb34" path="res://src/elements/weapons/auto_rifle.tres" id="2_6epbw"]
-[ext_resource type="Script" uid="uid://dvvmxb6ppict6" path="res://src/elements/weapons/weapon_resource.gd" id="2_42q2w"]
 [ext_resource type="Texture2D" uid="uid://8ggihh27mlrr" path="res://assets/sprites/blob_shadow.png" id="2_b0fo8"]
-[ext_resource type="Resource" uid="uid://c56y8pqoyk15f" path="res://src/elements/weapons/sniper.tres" id="3_kr4p8"]
 [ext_resource type="Script" uid="uid://bej4pk1jsdhu3" path="res://src/elements/player/player_camera.gd" id="4_g8ff7"]
-[ext_resource type="SpriteFrames" uid="uid://dbv3sy5qjatnl" path="res://assets/sprites/burst_animation.tres" id="4_m6ukc"]
 [ext_resource type="PackedScene" uid="uid://bsx1usq366uih" path="res://src/elements/ui/in_game_ui.tscn" id="4_x2jau"]
-[ext_resource type="AudioStream" uid="uid://cydjn1ct3hps2" path="res://assets/sounds/walking.ogg" id="5_ics1s"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_gdq8c"]
 radius = 0.3
 height = 1.0
 
 [node name="Player" type="CharacterBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 script = ExtResource("1_ffboj")
-weapons = Array[ExtResource("2_42q2w")]([ExtResource("2_6epbw"), ExtResource("3_kr4p8")])
 
 [node name="InGameUI" parent="." instance=ExtResource("4_x2jau")]
 
@@ -34,34 +27,6 @@ current = true
 fov = 80.0
 script = ExtResource("4_g8ff7")
 
-[node name="ViewportContainer" type="SubViewportContainer" parent="Head/Camera"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-stretch = true
-
-[node name="WeaponView" type="SubViewport" parent="Head/Camera/ViewportContainer"]
-transparent_bg = true
-handle_input_locally = false
-msaa_3d = 1
-size = Vector2i(1920, 1080)
-render_target_update_mode = 4
-
-[node name="CameraItem" type="Camera3D" parent="Head/Camera/ViewportContainer/WeaponView"]
-cull_mask = 1047554
-fov = 40.0
-
-[node name="WeaponContainer" type="Node3D" parent="Head/Camera/ViewportContainer/WeaponView/CameraItem"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, -1, -2.25)
-
-[node name="Muzzle" type="AnimatedSprite3D" parent="Head/Camera/ViewportContainer/WeaponView/CameraItem/WeaponContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.902016, 1.91892, -3.75)
-layers = 2
-sprite_frames = ExtResource("4_m6ukc")
-frame = 2
-
 [node name="RayCast" type="RayCast3D" parent="Head/Camera"]
 exclude_parent = false
 target_position = Vector3(0, 0, -1000)
@@ -73,7 +38,3 @@ size = Vector3(1, 2, 1)
 texture_albedo = ExtResource("2_b0fo8")
 modulate = Color(1, 1, 1, 0.705882)
 normal_fade = 0.5
-
-[node name="SoundFootsteps" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("5_ics1s")
-autoplay = true
