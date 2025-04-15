@@ -1,9 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://bsx1usq366uih"]
+[gd_scene load_steps=5 format=3 uid="uid://bsx1usq366uih"]
 
 [ext_resource type="Script" uid="uid://dcdowglvd2oyi" path="res://src/elements/ui/in_game_ui.gd" id="1_6al0f"]
-[ext_resource type="Script" uid="uid://kj4yuyvfes5a" path="res://src/elements/ui/hud/gameplay_hud.gd" id="2_nwc7u"]
 [ext_resource type="Texture2D" uid="uid://ogyonerhuxqq" path="res://assets/crosshair.png" id="3_73s3q"]
-[ext_resource type="Theme" uid="uid://m03cgcejchws" path="res://src/elements/ui/style/font_theme.tres" id="4_4nbmt"]
 [ext_resource type="Script" uid="uid://lblaiw3aanud" path="res://src/elements/ui/menus/options_menu.gd" id="4_8cb5d"]
 [ext_resource type="Script" uid="uid://cnld5vsyaf5i6" path="res://src/elements/ui/style/appliers/button_group.gd" id="6_3i5ob"]
 
@@ -17,7 +15,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("2_nwc7u")
 
 [node name="Crosshair" type="TextureRect" parent="GameplayHUD"]
 layout_mode = 1
@@ -40,7 +37,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("4_4nbmt")
 script = ExtResource("4_8cb5d")
 
 [node name="BackgroundColor" type="ColorRect" parent="OptionsMenu"]

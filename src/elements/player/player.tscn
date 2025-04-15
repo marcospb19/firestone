@@ -1,8 +1,6 @@
-[gd_scene load_steps=6 format=3 uid="uid://dl2ed4gkybggf"]
+[gd_scene load_steps=4 format=3 uid="uid://dl2ed4gkybggf"]
 
 [ext_resource type="Script" uid="uid://b6ct8sacwqxku" path="res://src/elements/player/player.gd" id="1_ffboj"]
-[ext_resource type="Texture2D" uid="uid://8ggihh27mlrr" path="res://assets/sprites/blob_shadow.png" id="2_b0fo8"]
-[ext_resource type="Script" uid="uid://bej4pk1jsdhu3" path="res://src/elements/player/player_camera.gd" id="4_g8ff7"]
 [ext_resource type="PackedScene" uid="uid://bsx1usq366uih" path="res://src/elements/ui/in_game_ui.tscn" id="4_x2jau"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_gdq8c"]
@@ -25,16 +23,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 cull_mask = 1048573
 current = true
 fov = 80.0
-script = ExtResource("4_g8ff7")
 
 [node name="RayCast" type="RayCast3D" parent="Head/Camera"]
 exclude_parent = false
 target_position = Vector3(0, 0, -1000)
 collide_with_areas = true
-
-[node name="Shadow" type="Decal" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.141817, 0)
-size = Vector3(1, 2, 1)
-texture_albedo = ExtResource("2_b0fo8")
-modulate = Color(1, 1, 1, 0.705882)
-normal_fade = 0.5
