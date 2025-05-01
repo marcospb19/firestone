@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://be2a8f1jkcwat"]
+
+[ext_resource type="Material" uid="uid://cithg67xrbqy5" path="res://materials/and_block.tres" id="1_m23b8"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_a80vk"]
+material = ExtResource("1_m23b8")
+
+[node name="AndGate" type="CSGMesh3D"]
+use_collision = true
+mesh = SubResource("BoxMesh_a80vk")

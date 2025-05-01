@@ -1,5 +1,7 @@
 extends Node
 
+const BLOCK_WIDTH := 1.00
+
 var main_camera: Camera3D
 var elapsed_delta := 0.0
 

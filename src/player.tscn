@@ -1,11 +1,11 @@
 [gd_scene load_steps=4 format=3 uid="uid://dl2ed4gkybggf"]
 
-[ext_resource type="Script" uid="uid://b6ct8sacwqxku" path="res://src/elements/player/player.gd" id="1_ffboj"]
-[ext_resource type="PackedScene" uid="uid://bsx1usq366uih" path="res://src/elements/ui/in_game_ui.tscn" id="4_x2jau"]
+[ext_resource type="Script" uid="uid://b6ct8sacwqxku" path="res://src/player.gd" id="1_ffboj"]
+[ext_resource type="PackedScene" uid="uid://bsx1usq366uih" path="res://src/ui/in_game_ui.tscn" id="4_x2jau"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_gdq8c"]
-radius = 0.3
-height = 1.0
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_rxibo"]
+height = 1.8
+radius = 0.4
 
 [node name="Player" type="CharacterBody3D"]
 script = ExtResource("1_ffboj")
@@ -13,16 +13,14 @@ script = ExtResource("1_ffboj")
 [node name="InGameUI" parent="." instance=ExtResource("4_x2jau")]
 
 [node name="Collider" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
-shape = SubResource("CapsuleShape3D_gdq8c")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CylinderShape3D_rxibo")
 
 [node name="Head" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.62, 0)
 
 [node name="Camera" type="Camera3D" parent="Head"]
-cull_mask = 1048573
 current = true
-fov = 80.0
 
 [node name="RayCast" type="RayCast3D" parent="Head/Camera"]
 exclude_parent = false
