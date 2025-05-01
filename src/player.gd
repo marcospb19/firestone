@@ -85,6 +85,8 @@ func handle_movement(delta: float):
 
 var is_fast_removing := false
 var is_fast_adding := false
+# If player holds to add blocks, make sure they're all facing the same direction
+var add_block_look_direction
 
 func handle_mouse_clicks():
 	var left = Input.is_action_pressed("mouse-left")
@@ -116,19 +118,26 @@ func handle_mouse_clicks():
 		try_edit_block(false, false)
 	elif should_slow_add:
 		try_edit_block(false, true)
+	elif not left and not right:
+		add_block_look_direction = null
 
 func try_edit_block(fast: bool, is_add: bool):
 	if edit_block_timer.time_left != 0.0:
 		return
+
 	raycast.force_raycast_update()
 	if not raycast.is_colliding():
 		return
 
+	if is_add and add_block_look_direction == null:
+		add_block_look_direction = -camera.global_basis.z
+	elif not is_add:
+		add_block_look_direction = null
+
 	var point = raycast.get_collision_point()
 	var normal = raycast.get_collision_normal()
 	if is_add:
-		var camera_direction = -camera.global_basis.z
-		add_block.emit(point + normal / 100000.0, selected_block, camera_direction)
+		add_block.emit(point + normal / 100000.0, selected_block, add_block_look_direction)
 	else:
 		remove_block.emit(point - normal / 100000.0)
 	if fast:
