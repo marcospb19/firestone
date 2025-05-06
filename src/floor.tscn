@@ -8,6 +8,5 @@ uv1_triplanar = true
 uv1_world_triplanar = true
 
 [node name="Floor" type="CSGBox3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 size = Vector3(64, 1, 64)
 material = SubResource("StandardMaterial3D_spa7t")

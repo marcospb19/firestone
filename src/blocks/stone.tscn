@@ -1,7 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://cwx75f0iebd41"]
-
-[ext_resource type="Material" uid="uid://c2cuond5o7it4" path="res://materials/stone_block.tres" id="1_pl2v4"]
-
-[node name="CSGBox3D" type="CSGBox3D"]
-use_collision = true
-material = ExtResource("1_pl2v4")

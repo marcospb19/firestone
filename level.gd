@@ -1,74 +1,58 @@
 extends Node3D
 
+const DIMENSIONS := Vector3i(2, 1, 2)
 const BLOCK_WIDTH := 1.0
+const CUT_OFF := 0.0
 const GRID_LAYERS := [15, 16, 20, 21]
-const BLOCKS := [
-	preload("res://src/blocks/dirt.tscn"),
-	preload("res://src/blocks/stone.tscn"),
-	preload("res://src/gates/and.tscn"),
-]
 
 @onready var player = $Player
 @onready var player_initial_position = player.position
 
-var blocks_container: Node3D
-var blocks: Dictionary[Vector3i, CSGPrimitive3D] = {}
-
 func _ready():
-	blocks_container = Node3D.new()
-	self.add_child(blocks_container)
+	var random = FastNoiseLite.new()
+	random.noise_type = FastNoiseLite.TYPE_SIMPLEX
 
-	var last_layer := 0
-	for i in len(GRID_LAYERS):
-		var layer: int = GRID_LAYERS[i]
-		for x in range(layer):
-			for z in range(layer):
-				if x < last_layer and z < last_layer:
-					continue
-				add_block_at(Vector3(x, i, z), 0)
-				add_block_at(Vector3(-x, i, z), 0)
-				add_block_at(Vector3(x, i, -z), 0)
-				add_block_at(Vector3(-x, i, -z), 0)
-		last_layer = layer
+	for x in DIMENSIONS.x:
+		for y in DIMENSIONS.y:
+			for z in DIMENSIONS.z:
+				var rand = random.get_noise_3d(x, y, z)
+				if rand > CUT_OFF:
+					var coordinate = Vector3i(x, y, z)
+					coordinate -= DIMENSIONS / 2 # centralize
+					coordinate.z -= 5
+					add_block_at(coordinate, VoxelWorld.BlockKind.STONE)
 
 # Only works cause BLOCK_WIDTH == 1.0, TODO: maybe use Vector3.snapped?
 func position_to_coordinate(pos: Vector3) -> Vector3i:
 	return pos.floor()
 
-func add_block_at_world_offset(pos: Vector3, selected_block: int, look_direction: Vector3):
-	add_block_at(position_to_coordinate(pos), selected_block, look_direction)
+func add_block_at_world_offset(pos: Vector3, block_kind: VoxelWorld.BlockKind, look_direction: Vector3):
+	add_block_at(position_to_coordinate(pos), block_kind, look_direction)
 
 func remove_block_at_world_offset(pos: Vector3):
 	remove_block_at(position_to_coordinate(pos))
 
-func add_block_at(coordinate: Vector3i, block_index: int, look_direction: Vector3 = Vector3.FORWARD):
-	if block_index >= BLOCKS.size():
-		return
-	var block: CSGPrimitive3D = BLOCKS[block_index].instantiate()
-	block.position = (Vector3(coordinate) + Vector3.ONE / 2.0) * Utils.BLOCK_WIDTH
-
+func add_block_at(coordinate: Vector3i, block_kind: VoxelWorld.BlockKind, look_direction: Vector3 = Vector3.FORWARD):
 	# Don't place a block if it collides with the player
 	var params := PhysicsShapeQueryParameters3D.new()
 	params.shape = BoxShape3D.new()
-	params.transform = Transform3D(Basis.IDENTITY, block.position)
+	params.shape.size = Vector3.ONE * 0.99
+	params.transform = Transform3D(Basis.IDENTITY, Vector3(coordinate) + Vector3.ONE * 0.5)
 	var collisions = self.get_world_3d().get_direct_space_state().intersect_shape(params, 2)
 	for collision in collisions:
 		if collision["rid"] == $Player.get_rid():
 			return
 
-	remove_block_at(coordinate)
-	blocks_container.add_child(block)
+	$VoxelWorld.add_block(coordinate, block_kind)
 
-	# Rotate based on the look direction
-	block.basis = look_direction_to_block_basis(look_direction)
-
-	blocks[coordinate] = block
+	#remove_block_at(coordinate)
+	## Rotate based on the look direction
+	#block.cube_mesh.basis = look_direction_to_block_basis(look_direction)
 
 func remove_block_at(coordinate: Vector3i):
-	var block = blocks.get(coordinate)
-	if block != null:
-		blocks_container.remove_child(block)
-		blocks.erase(coordinate)
+	$VoxelWorld.remove_block(coordinate)
+		#blocks_container.remove_child(block.cube_collision)
+		#blocks.erase(coordinate)
 
 func _on_player_reset_position():
 	player.position = player_initial_position
@@ -80,3 +64,6 @@ func look_direction_to_block_basis(look: Vector3) -> Basis:
 	look = look.normalized() # Compensate the fact that we zeroed `y`
 	var direction = look.snapped(Vector3.ONE * sqrt(2.0)).normalized() # Snap to one of the four directions
 	return Basis.looking_at(direction * 1_000_000, Vector3.UP)
+
+func _on_voxel_world_updated() -> void:
+	$StaticBody3D/CollisionShape3D.shape = $VoxelWorld.mesh.create_trimesh_shape()

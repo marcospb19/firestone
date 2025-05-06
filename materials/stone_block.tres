@@ -1,7 +1,0 @@
-[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://c2cuond5o7it4"]
-
-[ext_resource type="Texture2D" uid="uid://0x2ioverp8tx" path="res://assets/stone_block.png" id="1_sgrms"]
-
-[resource]
-albedo_texture = ExtResource("1_sgrms")
-texture_filter = 4

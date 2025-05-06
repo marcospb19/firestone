@@ -5,7 +5,7 @@ extends CharacterBody3D
 @export var jump_strength := 8.0
 @export var gravity := 25.0
 
-signal add_block(at_offset: Vector3, selected_block: int, look_direction: Vector3)
+signal add_block(at_offset: Vector3, block_kind: VoxelWorld.BlockKind, look_direction: Vector3)
 signal remove_block(at_offset: Vector3)
 signal reset_position
 
@@ -20,10 +20,14 @@ var health := 100
 var movement_velocity: Vector3
 var is_running := false
 var edit_block_timer: SceneTreeTimer
-var selected_block := 0
-var is_flying := false
+var is_flying := true
 var is_flying_toggle_timer: SceneTreeTimer
 var is_zooming := false
+var hotbar := Hotbar.new() # Tells what blocks are in what position, not the best abstraction
+var selected_block: int:
+	set(value):
+		selected_block = value
+		ui.update_selected_block(value)
 
 @onready var ui = $InGameUI
 @onready var camera: Camera3D = $Head/Camera
@@ -35,6 +39,7 @@ func _ready():
 	Utils.set_main_camera(camera)
 	edit_block_timer = self.get_tree().create_timer(0)
 	is_flying_toggle_timer = self.get_tree().create_timer(0)
+	selected_block = 0
 
 func _input(event):
 	if not Utils.is_mouse_captured():
@@ -44,11 +49,16 @@ func _input(event):
 		var rotation_diff = MOUSE_SENSITIVITY * event.relative * zoom_multiplier
 		rotation.y -= rotation_diff.x
 		camera.rotation.x = clampf(camera.rotation.x - rotation_diff.y, deg_to_rad(-90.0), deg_to_rad(90.0))
-	if event is InputEventKey and event.is_pressed():
-		var number = int(event.as_text_keycode()) # crazy conversion
-		if number >= 1:
-			selected_block = number - 1
-			ui.update_selected_block(selected_block)
+	elif event.is_pressed():
+		if event is InputEventMouseButton:
+			if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+				selected_block = (selected_block + 1) % 9
+			elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
+				selected_block = (selected_block + 8) % 9
+		elif event is InputEventKey:
+			var number = int(event.as_text_keycode()) # crazy conversion
+			if number >= 1:
+				selected_block = number - 1
 
 func _physics_process(delta: float):
 	if Utils.is_mouse_captured():
@@ -137,9 +147,12 @@ func try_edit_block(fast: bool, is_add: bool):
 	var point = raycast.get_collision_point()
 	var normal = raycast.get_collision_normal()
 	if is_add:
-		add_block.emit(point + normal / 100000.0, selected_block, add_block_look_direction)
+		var block = hotbar.access(selected_block)
+		if block == null:
+			return
+		add_block.emit(point + normal * 0.1, block, add_block_look_direction)
 	else:
-		remove_block.emit(point - normal / 100000.0)
+		remove_block.emit(point - normal * 0.1)
 	if fast:
 		edit_block_timer = self.get_tree().create_timer(BLOCK_FAST_PLACE_DELAY)
 	else:
