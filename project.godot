@@ -26,7 +26,7 @@ driver/output_latency=10
 
 Audio="*res://src/singletons/audio.gd"
 Utils="*res://src/singletons/utils.gd"
-SceneController="*res://src/scene_controller.gd"
+SceneController="*res://src/scripts/scene_controller.gd"
 
 [display]
 

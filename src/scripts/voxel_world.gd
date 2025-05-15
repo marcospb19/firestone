@@ -4,7 +4,7 @@ signal updated
 
 enum Face { FRONT, RIGHT, BACK, LEFT, TOP, BOTTOM }
 enum BlockKind { DIRT, STONE, GATE_AND }
-const BLOCKS_MATERIAL: StandardMaterial3D = preload("res://materials/blocks_material.tres")
+const BLOCKS_MATERIAL: StandardMaterial3D = preload("res://src/materials/blocks_material.tres")
 
 const VERTICES_PER_BLOCK := 6 * 6
 const FACE_TRIANGLES: Dictionary[Face, Array] = {

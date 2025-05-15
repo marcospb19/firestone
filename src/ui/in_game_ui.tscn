@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dcdowglvd2oyi" path="res://src/ui/in_game_ui.gd" id="1_6al0f"]
 [ext_resource type="Texture2D" uid="uid://ogyonerhuxqq" path="res://assets/crosshair.png" id="3_73s3q"]
 [ext_resource type="Texture2D" uid="uid://5kxw7b5ombpr" path="res://assets/toolbar.png" id="3_gtd8h"]
-[ext_resource type="Script" uid="uid://lblaiw3aanud" path="res://src/ui/menus/options_menu.gd" id="4_8cb5d"]
+[ext_resource type="Script" uid="uid://lblaiw3aanud" path="res://src/ui/options_menu.gd" id="4_8cb5d"]
 [ext_resource type="Texture2D" uid="uid://vocvmjj7kt4g" path="res://assets/toolbar_selection.png" id="4_37e62"]
 [ext_resource type="Script" uid="uid://cnld5vsyaf5i6" path="res://src/ui/style/appliers/button_group.gd" id="6_3i5ob"]
 

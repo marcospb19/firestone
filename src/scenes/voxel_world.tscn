@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://c5n0kfj74fb0p"]
 
-[ext_resource type="Script" uid="uid://v135ipmfsorr" path="res://src/voxel_world.gd" id="1_b5hb6"]
+[ext_resource type="Script" uid="uid://v135ipmfsorr" path="res://src/scripts/voxel_world.gd" id="1_b5hb6"]
 
 [node name="VoxelWorld" type="MeshInstance3D"]
 script = ExtResource("1_b5hb6")
