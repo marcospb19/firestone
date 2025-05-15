@@ -48,24 +48,22 @@ func add_block_at(coordinate: Vector3i, block_kind: VoxelWorld.BlockKind, look_d
 	$VoxelWorld.disable_updates = false
 	$VoxelWorld.enqueue_mesh_update()
 
-	#remove_block_at(coordinate)
-	# # Rotate based on the look direction
-	#block.cube_mesh.basis = look_direction_to_block_basis(look_direction)
-
 func remove_block_at(coordinate: Vector3i):
 	$VoxelWorld.remove_block(coordinate)
-	#blocks_container.remove_child(block.cube_collision)
-	#blocks.erase(coordinate)
 
 func _on_player_reset_position():
 	player.position = player_initial_position
 	player.velocity = Vector3.ZERO
 
 func look_direction_to_face(look: Vector3) -> VoxelWorld.Face:
-	look.y = 0.0 # Never aim blocks down or up, for now
-	look = look.normalized() # Compensate the fact that we zeroed `y`
-	var direction = look.snapped(Vector3.ONE * sqrt(2.0)).normalized() # Snap to one of the four directions
-	#direction = -direction # Block will face away from player # TODO: review this
+	look.y = 0.0 # Blocks can't face up or down
+	look = look.normalized() # Compensate the zeroed `y`
+	var direction = look.snappedf(sqrt(2.0))
+	if not is_equal_approx(absf(direction.x) + absf(direction.y) + absf(direction.z), 1.0):
+		# If you're perfectly aiming at Vector3(sqrt(2.0), 0.0, sqrt(2.0)), you'll be in-between
+		# two directions, pick one of them by rotating a little to the right.
+		# (since look can't be UP or DOWN, that sum can only be 1.0 or sqrt(2.0)
+		direction = look.rotated(Vector3.UP, deg_to_rad(1)).snappedf(sqrt(2.0))
 	return VoxelWorld.FACE_NORMALS_REVERSED[Vector3i(direction)]
 
 func _on_voxel_world_updated() -> void:

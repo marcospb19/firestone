@@ -1,14 +1,14 @@
-extends CanvasLayer
+extends Control
 
-@onready var gameplay_hud: Control = $GameplayHUD
-@onready var toolbar_selection: CanvasLayer = $GameplayHUD/ToolbarSelection
+@onready var unpaused_hud: Control = $UnpausedHUD
+@onready var toolbar_selection: TextureRect = $FixedHUD/ToolbarSelectionSquare
 @onready var options_menu: Control = $OptionsMenu
 
 var is_menu_open := false:
 	set(value):
 		is_menu_open = value
 		options_menu.visible = value
-		gameplay_hud.visible = not value
+		unpaused_hud.visible = not value
 		if is_menu_open:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		else:
@@ -29,5 +29,8 @@ func _on_quit_button_pressed():
 	SceneController.quit()
 
 func update_selected_block(value: int):
-	var scaled_size = 20 * 4
-	toolbar_selection.offset = Vector2(scaled_size, 0) * (value - 4.0)
+	const TEXTURE_SIZE = 22
+	const SQUARE_OVERFLOW = 2
+	var selection_offset = ((TEXTURE_SIZE - SQUARE_OVERFLOW) * 4) * (value - 4)
+	toolbar_selection.offset_left = selection_offset - TEXTURE_SIZE * 2.0
+	toolbar_selection.offset_right = selection_offset + TEXTURE_SIZE * 2.0

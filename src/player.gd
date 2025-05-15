@@ -52,7 +52,10 @@ func _input(event):
 		var zoom_multiplier = 1.0 / 3.0 if is_zooming else 1.0
 		var rotation_diff = MOUSE_SENSITIVITY * event.relative * zoom_multiplier
 		rotation.y -= rotation_diff.x
-		camera.rotation.x = clampf(camera.rotation.x - rotation_diff.y, deg_to_rad(-90.0), deg_to_rad(90.0))
+		# By not looking straight down or up, we can always tell what direction the user is facing
+		# this is useful to know how to orient placed blocks
+		const VERTICAL_LIMIT := deg_to_rad(90.0 - 0.00001)
+		camera.rotation.x = clampf(camera.rotation.x - rotation_diff.y, -VERTICAL_LIMIT, VERTICAL_LIMIT)
 	elif event.is_pressed():
 		if event is InputEventMouseButton:
 			if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:

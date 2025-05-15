@@ -7,18 +7,24 @@
 [ext_resource type="Texture2D" uid="uid://vocvmjj7kt4g" path="res://assets/toolbar_selection.png" id="4_37e62"]
 [ext_resource type="Script" uid="uid://cnld5vsyaf5i6" path="res://src/ui/style/appliers/button_group.gd" id="6_3i5ob"]
 
-[node name="InGameUI" type="CanvasLayer"]
-script = ExtResource("1_6al0f")
-
-[node name="GameplayHUD" type="Control" parent="."]
+[node name="InGameUI" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_6al0f")
 
-[node name="Crosshair" type="TextureRect" parent="GameplayHUD"]
+[node name="UnpausedHUD" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Crosshair" type="TextureRect" parent="UnpausedHUD"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -31,7 +37,15 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 texture = ExtResource("3_73s3q")
 
-[node name="Toolbar" type="TextureRect" parent="GameplayHUD"]
+[node name="FixedHUD" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Toolbar" type="TextureRect" parent="FixedHUD"]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -47,9 +61,8 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 texture = ExtResource("3_gtd8h")
 
-[node name="ToolbarSelection" type="CanvasLayer" parent="GameplayHUD"]
-
-[node name="SelectionSquare" type="TextureRect" parent="GameplayHUD/ToolbarSelection"]
+[node name="ToolbarSelectionSquare" type="TextureRect" parent="FixedHUD"]
+layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
@@ -66,7 +79,7 @@ texture = ExtResource("4_37e62")
 
 [node name="OptionsMenu" type="Control" parent="."]
 visible = false
-layout_mode = 3
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -108,6 +121,5 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Quit"
 
-[connection signal="menu_closed" from="OptionsMenu" to="." method="_on_options_menu_menu_closed"]
 [connection signal="pressed" from="OptionsMenu/Buttons/ResumeButton" to="." method="_on_resume_button_pressed"]
 [connection signal="pressed" from="OptionsMenu/Buttons/QuitButton" to="." method="_on_quit_button_pressed"]
