@@ -76,6 +76,9 @@ func add_block(pos: Vector3i, kind: BlockKind):
 	# #
 	# # Por conta disso, um swap_remove naive que assume tamanho fixo não vai
 	# # funcionar, preciso brainstormar como vou resolver
+	# #
+	# # Seria mais fácil resolver isso depois, quando esse código
+	# # inevitavelmente for portado para Rust (no futuuuro)
 	#if not has_neighbor(Face.FRONT, pos):
 		#add_face(Face.FRONT, pos, uv_offset)
 	#if not has_neighbor(Face.RIGHT, pos):
