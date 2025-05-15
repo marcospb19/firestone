@@ -2,12 +2,7 @@
 
 [sub_resource type="Environment" id="Environment_elqe6"]
 background_mode = 1
-background_color = Color(0.536658, 0.514364, 0.824575, 1)
-ambient_light_source = 2
-ambient_light_color = Color(1, 0.857, 0.67, 1)
-ambient_light_sky_contribution = 0.0
-ambient_light_energy = 0.75
-reflected_light_source = 1
+background_color = Color(0.295, 0.403167, 0.59, 1)
 
 [node name="Node3D" type="Node3D"]
 

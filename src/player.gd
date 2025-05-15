@@ -8,6 +8,7 @@ extends CharacterBody3D
 signal add_block(at_offset: Vector3, block_kind: VoxelWorld.BlockKind, look_direction: Vector3)
 signal remove_block(at_offset: Vector3)
 signal reset_position
+signal connect_faces(from: Vector3, from_face: VoxelWorld.Face, to: Vector3, to_face: VoxelWorld.Face)
 
 const RUN_MULTIPLIER := 1.4
 const DOUBLE_JUMP_TOGGLE_DELAY := 0.3
@@ -28,6 +29,9 @@ var selected_block: int:
 	set(value):
 		selected_block = value
 		ui.update_selected_block(value)
+
+var pending_connection_pos = null
+var pending_connection_face = null
 
 @onready var ui = $InGameUI
 @onready var camera: Camera3D = $Head/Camera
@@ -66,6 +70,20 @@ func _physics_process(delta: float):
 			reset_position.emit()
 		handle_movement(delta)
 		handle_mouse_clicks()
+		if Input.is_action_just_pressed("paint-face"):
+			raycast.force_raycast_update()
+			if raycast.is_colliding():
+				var normal = raycast.get_collision_normal()
+				var point = raycast.get_collision_point() - normal * 0.01
+				var face = VoxelWorld.FACE_NORMALS_REVERSED[Vector3i(normal)]
+				if pending_connection_face == null:
+					pending_connection_face = face
+					pending_connection_pos = point
+				else:
+					connect_faces.emit(pending_connection_pos, pending_connection_face, point, face)
+					pending_connection_face = null
+					pending_connection_pos = null
+
 		handle_zooming()
 	self.move_and_slide()
 
@@ -150,9 +168,9 @@ func try_edit_block(fast: bool, is_add: bool):
 		var block = hotbar.access(selected_block)
 		if block == null:
 			return
-		add_block.emit(point + normal * 0.1, block, add_block_look_direction)
+		add_block.emit(point + normal * 0.01, block, add_block_look_direction)
 	else:
-		remove_block.emit(point - normal * 0.1)
+		remove_block.emit(point - normal * 0.01)
 	if fast:
 		edit_block_timer = self.get_tree().create_timer(BLOCK_FAST_PLACE_DELAY)
 	else:
