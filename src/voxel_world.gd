@@ -6,6 +6,7 @@ enum Face { FRONT, RIGHT, BACK, LEFT, TOP, BOTTOM }
 enum BlockKind { DIRT, STONE, GATE_AND }
 const BLOCKS_MATERIAL: StandardMaterial3D = preload("res://materials/blocks_material.tres")
 
+const VERTICES_PER_BLOCK := 6 * 6
 const FACE_TRIANGLES: Dictionary[Face, Array] = {
 	Face.FRONT: [[0, 4, 5], [0, 5, 1]],
 	Face.RIGHT: [[1, 5, 6], [1, 6, 2]],
@@ -14,7 +15,6 @@ const FACE_TRIANGLES: Dictionary[Face, Array] = {
 	Face.TOP: [[4, 7, 6], [4, 6, 5]],
 	Face.BOTTOM: [[0, 1, 2], [0, 2, 3]],
 }
-const VERTICES_PER_BLOCK := 6 * 6
 const CUBE_VERTICES_MAPPING: Array[Vector3] = [
 	Vector3(0.0, 0.0, 1.0),
 	Vector3(1.0, 0.0, 1.0),
@@ -26,15 +26,12 @@ const CUBE_VERTICES_MAPPING: Array[Vector3] = [
 	Vector3(0.0, 1.0, 0.0),
 ]
 
-const UVS_PER_BLOCK := 6 * 6
-const UVS_PER_FACE := 6
 const BLOCKS_TEXTURE_UV_OFFSET: Dictionary[BlockKind, Vector2] = {
 	BlockKind.STONE: Vector2(0.0, 0.0),
 	BlockKind.DIRT: Vector2(0.25, 0.0),
 	BlockKind.GATE_AND: Vector2(0.5, 0.0),
 }
 
-const NORMALS_PER_BLOCK := 6 * 6
 const FACE_NORMALS: Dictionary[Face, Vector3i] = {
 	Face.FRONT: Vector3i.BACK,
 	Face.RIGHT: Vector3i.RIGHT,
@@ -114,8 +111,8 @@ func remove_block(remove_pos: Vector3i):
 		position_to_index[last_pos] = remove_index
 
 	Utils.swap_remove_window(vertices, remove_index, VERTICES_PER_BLOCK)
-	Utils.swap_remove_window(normals, remove_index, NORMALS_PER_BLOCK)
-	Utils.swap_remove_window(uvs, remove_index, UVS_PER_BLOCK)
+	Utils.swap_remove_window(normals, remove_index, VERTICES_PER_BLOCK)
+	Utils.swap_remove_window(uvs, remove_index, VERTICES_PER_BLOCK)
 	enqueue_mesh_update()
 
 func has_neighbor(face: Face, pos: Vector3i) -> bool:
@@ -137,7 +134,7 @@ func add_face(face: Face, pos: Vector3i, uv_offset: Vector2):
 	uvs.append(uv_offset + Vector2(0.0, 0.25))
 
 func update_face_uv(block_index: int, face: Face, uv_offset: Vector2):
-	var index_start = block_index * UVS_PER_BLOCK + (face as int) * UVS_PER_FACE
+	var index_start = block_index * VERTICES_PER_BLOCK + (face as int) * 6
 	uvs.set(index_start + 0, uv_offset + Vector2(0.0, 0.0))
 	uvs.set(index_start + 1, uv_offset + Vector2(0.25, 0.0))
 	uvs.set(index_start + 2, uv_offset + Vector2(0.25, 0.25))
