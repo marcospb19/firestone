@@ -89,7 +89,6 @@ func _on_player_connect_faces(from: Vector3, from_face: VoxelWorld.Face, to: Vec
 
 	cable.material = StandardMaterial3D.new()
 	cable.material.albedo_color = Color.YELLOW
-	cable.material.vertex_color_use_as_albedo = true
 
 # Only works cause BLOCK_WIDTH == 1.0, TODO: maybe use Vector3.snapped?
 func position_to_coordinate(pos: Vector3) -> Vector3i:

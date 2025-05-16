@@ -1,0 +1,10 @@
+[package]
+name = "firestone_gdext"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+godot = { git = "https://github.com/godot-rust/gdext", rev = "4d2251bbd669c7d252c04b90738d42089483fb51" }
