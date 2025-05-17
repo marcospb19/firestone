@@ -1,7 +1,6 @@
 extends CharacterBody3D
 
 @export_subgroup("Properties")
-@export var movement_speed := 4.0
 @export var jump_strength := 8.0
 @export var gravity := 25.0
 
@@ -10,7 +9,10 @@ signal remove_block(at_offset: Vector3)
 signal reset_position
 signal connect_faces(from: Vector3, from_face: VoxelWorld.Face, to: Vector3, to_face: VoxelWorld.Face)
 
-const RUN_MULTIPLIER := 1.4
+const MOVEMENT_SPEED := 6.0
+const RUN_SPEED_MULTIPLIER := 1.4
+const FLYING_SPEED_MULTIPLIER := 1.4
+
 const DOUBLE_JUMP_TOGGLE_DELAY := 0.3
 const BLOCK_PLACE_DELAY := 0.2
 const BLOCK_FAST_PLACE_DELAY := 0.2 / 3.0
@@ -107,11 +109,15 @@ func handle_movement(delta: float):
 				velocity.y = max(jump_strength, velocity.y + jump_strength / 2.0)
 
 	var input = Input.get_vector("move-left", "move-right", "move-forward", "move-back")
-	var run_multiplier := 1.0 + float(Input.is_action_pressed("shift"))
-	var wasd_movement := input.limit_length(1.0) * movement_speed * run_multiplier
+	var speed := (
+		MOVEMENT_SPEED
+			* (RUN_SPEED_MULTIPLIER if Input.is_action_pressed("shift") else 1.0)
+			* (FLYING_SPEED_MULTIPLIER if is_flying else 1.0)
+	)
+	var wasd_movement := input.limit_length(1.0) * speed
 	velocity = Vector3(wasd_movement.x, velocity.y, wasd_movement.y)
 	if velocity.z < 0.0:
-		velocity.z *= RUN_MULTIPLIER
+		velocity.z *= RUN_SPEED_MULTIPLIER
 	velocity = transform.basis * velocity
 
 var is_fast_removing := false
