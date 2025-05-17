@@ -69,7 +69,7 @@ impl INode for CircuitSimulation {
     fn process(&mut self, delta: f32) {
         self.elapsed += delta;
         while self.elapsed > 1.0 {
-            godot_print!("step");
+            godot_print!("Simulation tick {}", self.engine.current_tick());
             self.elapsed -= 1.0;
             self.engine.run_step();
             for (a, b) in self.engine.components() {

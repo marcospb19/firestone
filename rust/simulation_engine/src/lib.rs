@@ -32,12 +32,16 @@ pub struct SimulationEngine {
     outgoing_edges: FxHashMap<ComponentId, BTreeMap<ComponentId, BTreeSet<Edge>>>,
     tickless_dag: Acyclic<GraphMap<ComponentId, (), Directed>>,
     id_gen: ComponentIdGenerator,
-    eval_version: u64,
+    current_tick: u64,
 }
 
 impl SimulationEngine {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn current_tick(&self) -> u64 {
+        self.current_tick
     }
 
     pub fn add(&mut self, kind: ComponentKind) -> ComponentId {
@@ -147,8 +151,8 @@ impl SimulationEngine {
     }
 
     pub fn run_step(&mut self) {
-        self.eval_version += 1;
-        let version = self.eval_version;
+        self.current_tick += 1;
+        let version = self.current_tick;
 
         // tick it, propagate all the delay states
         if let mut edits = vec![] {
