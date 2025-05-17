@@ -1,7 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://be2a8f1jkcwat"]
-
-[sub_resource type="ImmediateMesh" id="ImmediateMesh_jcrac"]
-
-[node name="AndGate" type="CSGMesh3D"]
-use_collision = true
-mesh = SubResource("ImmediateMesh_jcrac")

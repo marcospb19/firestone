@@ -1,9 +1,10 @@
 class_name Hotbar
 
-var elements: Array[VoxelWorld.BlockKind] = [
-	VoxelWorld.BlockKind.DIRT,
-	VoxelWorld.BlockKind.STONE,
-	VoxelWorld.BlockKind.GATE_AND,
+var elements: Array[VoxelWorld.FaceKind] = [
+	VoxelWorld.FaceKind.DIRT,
+	VoxelWorld.FaceKind.STONE,
+	VoxelWorld.FaceKind.AND_BLANK,
+	VoxelWorld.FaceKind.NOT_BLANK,
 ]
 
 func access(index: int):

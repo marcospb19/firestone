@@ -3,9 +3,28 @@ class_name VoxelWorld extends MeshInstance3D
 signal updated
 
 enum Face { FRONT, RIGHT, BACK, LEFT, TOP, BOTTOM }
-enum BlockKind { DIRT, STONE, GATE_AND }
+enum FaceKind {
+	DIRT,
+	STONE,
+	AND_BLANK,
+	AND_INPUT,
+	AND_OUTPUT,
+	NOT_BLANK,
+	NOT_INPUT,
+	NOT_OUTPUT,
+}
 const BLOCKS_MATERIAL: StandardMaterial3D = preload("res://src/materials/blocks_material.tres")
 
+const BLOCKS_TEXTURE_UV_OFFSET: Dictionary[FaceKind, Vector2] = {
+	FaceKind.DIRT: Vector2(0.0, 0.0),
+	FaceKind.STONE: Vector2(0.25, 0.0),
+	FaceKind.AND_BLANK: Vector2(0.0, 0.25),
+	FaceKind.AND_INPUT: Vector2(0.25, 0.25),
+	FaceKind.AND_OUTPUT: Vector2(0.5, 0.25),
+	FaceKind.NOT_BLANK: Vector2(0.0, 0.5),
+	FaceKind.NOT_INPUT: Vector2(0.25, 0.5),
+	FaceKind.NOT_OUTPUT: Vector2(0.5, 0.5),
+}
 const VERTICES_PER_BLOCK := 6 * 6
 const FACE_TRIANGLES: Dictionary[Face, Array] = {
 	Face.FRONT: [[0, 4, 5], [0, 5, 1]],
@@ -26,12 +45,6 @@ const CUBE_VERTICES_MAPPING: Array[Vector3] = [
 	Vector3(0.0, 1.0, 0.0),
 ]
 
-const BLOCKS_TEXTURE_UV_OFFSET: Dictionary[BlockKind, Vector2] = {
-	BlockKind.STONE: Vector2(0.0, 0.0),
-	BlockKind.DIRT: Vector2(0.25, 0.0),
-	BlockKind.GATE_AND: Vector2(0.5, 0.0),
-}
-
 const FACE_NORMALS: Dictionary[Face, Vector3i] = {
 	Face.FRONT: Vector3i.BACK,
 	Face.RIGHT: Vector3i.RIGHT,
@@ -41,9 +54,9 @@ const FACE_NORMALS: Dictionary[Face, Vector3i] = {
 	Face.BOTTOM: Vector3i.DOWN,
 }
 const FACE_NORMALS_REVERSED: Dictionary[Vector3i, Face] = {
-	Vector3i.BACK: Face.FRONT,
-	Vector3i.RIGHT: Face.RIGHT,
 	Vector3i.FORWARD: Face.BACK,
+	Vector3i.RIGHT: Face.RIGHT,
+	Vector3i.BACK: Face.FRONT,
 	Vector3i.LEFT: Face.LEFT,
 	Vector3i.UP: Face.TOP,
 	Vector3i.DOWN: Face.BOTTOM,
@@ -56,21 +69,29 @@ var uvs := PackedVector2Array()
 var update_pending := false
 var disable_updates := false
 
-var index_to_position := PackedVector3Array() # Used as a stack
-var position_to_index: Dictionary[Vector3i, int] = {}
+var blocks: Dictionary[Vector3i, BlockInfo] = {}
+var block_positions := PackedVector3Array() # Used as a stack
+
+class BlockInfo:
+	var index: int
+	var face_kinds: Array[FaceKind]
+
+	func _init(index_: int, face_kinds_: Array[FaceKind]):
+		index = index_
+		face_kinds = face_kinds_
 
 func _init():
 	mesh = ArrayMesh.new()
 	surface_array.resize(Mesh.ARRAY_MAX)
 
-func add_block(pos: Vector3i, kind: BlockKind):
-	if position_to_index.has(pos):
+func add_block(pos: Vector3i, face_kind: FaceKind):
+	if blocks.has(pos):
 		remove_block(pos)
 
-	position_to_index[pos] = position_to_index.size()
-	index_to_position.append(pos)
+	blocks[pos] = BlockInfo.new(blocks.size(), face_kind_repeat_array(face_kind))
+	block_positions.append(pos)
 
-	var uv_offset = BLOCKS_TEXTURE_UV_OFFSET[kind]
+	var uv_offset = BLOCKS_TEXTURE_UV_OFFSET[face_kind]
 	# # Pela checagem de vizinhos, o add face coloca uma quantidade dinâmica de
 	# # elementos nos arrays
 	# #
@@ -101,26 +122,25 @@ func add_block(pos: Vector3i, kind: BlockKind):
 	enqueue_mesh_update()
 
 func remove_block(remove_pos: Vector3i):
-	var last_pos := Vector3i(index_to_position[-1])
+	var block_to_remove := blocks[remove_pos]
+	var last_pos := Vector3i(block_positions[-1])
+	var last_index := blocks[last_pos].index
+	blocks.erase(remove_pos)
+	block_positions.remove_at(block_positions.size() - 1)
 
-	var remove_index := position_to_index[remove_pos]
-	var last_index := position_to_index[last_pos]
+	if last_index != block_to_remove.index:
+		# Last element was swapped, update its new index
+		block_positions.set(block_to_remove.index, last_pos)
+		blocks[last_pos].index = block_to_remove.index
 
-	position_to_index.erase(remove_pos)
-	index_to_position.remove_at(index_to_position.size() - 1)
-
-	if last_index != remove_index:
-		index_to_position.set(remove_index, last_pos)
-		position_to_index[last_pos] = remove_index
-
-	Utils.swap_remove_window(vertices, remove_index, VERTICES_PER_BLOCK)
-	Utils.swap_remove_window(normals, remove_index, VERTICES_PER_BLOCK)
-	Utils.swap_remove_window(uvs, remove_index, VERTICES_PER_BLOCK)
+	Utils.swap_remove_window(vertices, block_to_remove.index, VERTICES_PER_BLOCK)
+	Utils.swap_remove_window(normals, block_to_remove.index, VERTICES_PER_BLOCK)
+	Utils.swap_remove_window(uvs, block_to_remove.index, VERTICES_PER_BLOCK)
 	enqueue_mesh_update()
 
 func has_neighbor(face: Face, pos: Vector3i) -> bool:
 	var neighbor_position = pos + FACE_NORMALS[face]
-	return position_to_index.has(neighbor_position)
+	return blocks.has(neighbor_position)
 
 func add_face(face: Face, pos: Vector3i, uv_offset: Vector2):
 	for triangle in FACE_TRIANGLES[face]:
@@ -136,8 +156,10 @@ func add_face(face: Face, pos: Vector3i, uv_offset: Vector2):
 	uvs.append(uv_offset + Vector2(0.25, 0.25))
 	uvs.append(uv_offset + Vector2(0.0, 0.25))
 
-func update_face_uv(block_index: int, face: Face, uv_offset: Vector2):
-	var index_start = block_index * VERTICES_PER_BLOCK + (face as int) * 6
+func update_face_uv(coords: Vector3i, face: Face, face_kind: FaceKind):
+	blocks[coords].face_kinds[face] = face_kind
+	var uv_offset = BLOCKS_TEXTURE_UV_OFFSET[face_kind]
+	var index_start = blocks[coords].index * VERTICES_PER_BLOCK + (face as int) * 6
 	uvs.set(index_start + 0, uv_offset + Vector2(0.0, 0.0))
 	uvs.set(index_start + 1, uv_offset + Vector2(0.25, 0.0))
 	uvs.set(index_start + 2, uv_offset + Vector2(0.25, 0.25))
@@ -164,3 +186,39 @@ func enqueue_mesh_update():
 		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
 		mesh.surface_set_material(0, BLOCKS_MATERIAL)
 		updated.emit()
+
+static func is_kind_gate(kind: FaceKind) -> bool:
+	match kind:
+		FaceKind.DIRT, FaceKind.STONE:
+			return false
+		_:
+			return true
+
+static func is_kind_input(kind: FaceKind) -> bool:
+	match kind:
+		FaceKind.AND_INPUT, FaceKind.NOT_INPUT:
+			return true
+		_:
+			return false
+
+static func is_kind_output(kind: FaceKind) -> bool:
+	match kind:
+		FaceKind.AND_OUTPUT, FaceKind.NOT_OUTPUT:
+			return true
+		_:
+			return false
+
+static func blank_to_input(kind: FaceKind) -> FaceKind:
+	return (kind + 1) as FaceKind
+
+static func blank_to_output(kind: FaceKind) -> FaceKind:
+	return (kind + 2) as FaceKind
+
+func face_kind_from_block_face(coords: Vector3i, face: Face) -> FaceKind:
+	return blocks[coords].face_kinds[face]
+
+static func face_kind_repeat_array(face_kind: FaceKind) -> Array[FaceKind]:
+	return [
+		face_kind, face_kind, face_kind,
+		face_kind, face_kind, face_kind,
+	]

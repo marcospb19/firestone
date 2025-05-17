@@ -21,15 +21,15 @@ func _ready():
 					coordinate -= DIMENSIONS / 2 # centralize
 					#coordinate.z -= DIMENSIONS.z / 1.8 + 5
 					coordinate.y -= 2
-					add_block_at(coordinate, VoxelWorld.BlockKind.DIRT)
+					add_block_at(coordinate, VoxelWorld.FaceKind.DIRT)
 
-func add_block_at_world_offset(pos: Vector3, block_kind: VoxelWorld.BlockKind, look_direction: Vector3):
-	add_block_at(position_to_coordinate(pos), block_kind, look_direction)
+func add_block_at_world_offset(pos: Vector3, face_kind: VoxelWorld.FaceKind, look_direction: Vector3):
+	add_block_at(position_to_coordinate(pos), face_kind, look_direction)
 
 func remove_block_at_world_offset(pos: Vector3):
 	remove_block_at(position_to_coordinate(pos))
 
-func add_block_at(coordinate: Vector3i, block_kind: VoxelWorld.BlockKind, look_direction: Vector3 = Vector3.FORWARD):
+func add_block_at(coordinate: Vector3i, face_kind: VoxelWorld.FaceKind, look_direction: Vector3 = Vector3.FORWARD):
 	# Don't place a block if it collides with the player
 	var params := PhysicsShapeQueryParameters3D.new()
 	params.shape = BoxShape3D.new()
@@ -41,10 +41,11 @@ func add_block_at(coordinate: Vector3i, block_kind: VoxelWorld.BlockKind, look_d
 			return
 
 	$VoxelWorld.disable_updates = true
-	$VoxelWorld.add_block(coordinate, block_kind)
+	$VoxelWorld.add_block(coordinate, face_kind)
 
-	if block_kind == VoxelWorld.BlockKind.GATE_AND:
-		$VoxelWorld.update_face_uv($VoxelWorld.index_to_position.size() - 1, look_direction_to_face(look_direction), Vector2(0.0, 0.25))
+	if VoxelWorld.is_kind_gate(face_kind):
+		$VoxelWorld.update_face_uv($VoxelWorld.block_positions[-1], look_direction_to_face(look_direction), VoxelWorld.blank_to_output(face_kind))
+		$VoxelWorld.update_face_uv($VoxelWorld.block_positions[-1], look_direction_to_face(-look_direction), VoxelWorld.blank_to_input(face_kind))
 	$VoxelWorld.disable_updates = false
 	$VoxelWorld.enqueue_mesh_update()
 
@@ -72,23 +73,36 @@ func _on_voxel_world_updated() -> void:
 func _on_player_connect_faces(from: Vector3, from_face: VoxelWorld.Face, to: Vector3, to_face: VoxelWorld.Face):
 	var from_coords = position_to_coordinate(from)
 	var to_coords = position_to_coordinate(to)
-	$VoxelWorld.update_face_uv($VoxelWorld.position_to_index[from_coords], from_face, Vector2(0.0, 0.25))
-	$VoxelWorld.update_face_uv($VoxelWorld.position_to_index[to_coords], to_face, Vector2(0.0, 0.25))
+
+	if from_coords == to_coords:
+		printerr('cant connect block to itself')
+		return
+
+	var from_face_kind = $VoxelWorld.face_kind_from_block_face(from_coords, from_face)
+	var to_face_kind = $VoxelWorld.face_kind_from_block_face(to_coords, to_face)
+
+	if not VoxelWorld.is_kind_gate(from_face_kind):
+		printerr('from is not gate, not connecting')
+		return
+	if not VoxelWorld.is_kind_gate(to_face_kind):
+		printerr('to is not gate, not connecting')
+		return
+
+	if not VoxelWorld.is_kind_output(from_face_kind) or not VoxelWorld.is_kind_input(to_face_kind):
+		printerr('from is not output, or to is not input')
+		return
+
+	$VoxelWorld.update_face_uv(from_coords, from_face, from_face_kind)
+	$VoxelWorld.update_face_uv(to_coords, to_face, to_face_kind)
 	from = coordinate_to_position(from_coords)
 	to = coordinate_to_position(to_coords)
 
+	$CircuitSimulation.connect_blocks(from_coords, to_coords, from_face_kind == VoxelWorld.FaceKind.AND_OUTPUT, to_face_kind == VoxelWorld.FaceKind.AND_INPUT)
+
 	var cable_start = from + VoxelWorld.FACE_NORMALS[from_face] / 2.0
 	var cable_end = to + VoxelWorld.FACE_NORMALS[to_face] / 2.0
-	var distance = (cable_start - cable_end).length() + 0.1
-
-	var cable = CSGBox3D.new()
+	var cable = Cable.new(cable_start, cable_end)
 	self.add_child(cable)
-	cable.look_at(cable_start.direction_to(cable_end))
-	cable.size = Vector3(0.1, 0.1, distance)
-	cable.position = (cable_start + cable_end) / 2.0
-
-	cable.material = StandardMaterial3D.new()
-	cable.material.albedo_color = Color.YELLOW
 
 # Only works cause BLOCK_WIDTH == 1.0, TODO: maybe use Vector3.snapped?
 func position_to_coordinate(pos: Vector3) -> Vector3i:

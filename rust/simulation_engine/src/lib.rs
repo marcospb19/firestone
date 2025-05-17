@@ -5,15 +5,17 @@ mod component;
 
 use std::{
     array,
-    collections::{BTreeMap, BTreeSet, HashMap},
+    collections::{BTreeMap, BTreeSet},
 };
 
-use component::{Component, ComponentId, ComponentIdGenerator, ComponentKind};
+use component::{Component, ComponentIdGenerator};
+pub use component::{ComponentId, ComponentKind};
 use petgraph::{
     acyclic::Acyclic,
     data::Build,
     prelude::{Directed, Direction::Outgoing, GraphMap},
 };
+use rustc_hash::FxHashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 struct Edge {
@@ -24,16 +26,20 @@ struct Edge {
 }
 
 #[derive(Default)]
-pub struct Simulation {
-    nodes: HashMap<ComponentId, Component>,
-    incoming_edges: HashMap<ComponentId, BTreeMap<ComponentId, BTreeSet<Edge>>>,
-    outgoing_edges: HashMap<ComponentId, BTreeMap<ComponentId, BTreeSet<Edge>>>,
+pub struct SimulationEngine {
+    nodes: FxHashMap<ComponentId, Component>,
+    incoming_edges: FxHashMap<ComponentId, BTreeMap<ComponentId, BTreeSet<Edge>>>,
+    outgoing_edges: FxHashMap<ComponentId, BTreeMap<ComponentId, BTreeSet<Edge>>>,
     tickless_dag: Acyclic<GraphMap<ComponentId, (), Directed>>,
     id_gen: ComponentIdGenerator,
     eval_version: u64,
 }
 
-impl Simulation {
+impl SimulationEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     pub fn add(&mut self, kind: ComponentKind) -> ComponentId {
         let component_id = self.id_gen.next_id();
         if !kind.is_delay() {
@@ -41,6 +47,10 @@ impl Simulation {
         }
         self.nodes.insert(component_id, Component::new(kind));
         component_id
+    }
+
+    pub fn components(&self) -> &FxHashMap<ComponentId, Component> {
+        &self.nodes
     }
 
     pub fn add_array<const N: usize>(&mut self, array: [ComponentKind; N]) -> [ComponentId; N] {
@@ -274,9 +284,15 @@ impl Simulation {
 }
 
 #[derive(Debug)]
-struct State {
+pub struct State {
     values: Vec<bool>,
     version: u64,
+}
+
+impl State {
+    pub fn values(&self) -> &[bool] {
+        &self.values
+    }
 }
 
 #[cfg(test)]
@@ -286,7 +302,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn panic_on_trivial_self_cycle() {
-        let mut sim = Simulation::default();
+        let mut sim = SimulationEngine::default();
         let not = sim.add(Not);
         sim.wire0(not, not);
     }
@@ -294,7 +310,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn panic_on_short_cycle() {
-        let mut sim = Simulation::default();
+        let mut sim = SimulationEngine::default();
         let [v, u] = sim.add_array_of(Not);
         sim.wire0(v, u);
         sim.wire0(u, v);
@@ -302,7 +318,7 @@ mod tests {
 
     #[test]
     fn test_disconnected_components() {
-        let mut sim = Simulation::default();
+        let mut sim = SimulationEngine::default();
         let components = sim.add_array([Not, Not, Delay, Delay]);
         for i in 0..100 {
             sim.run_step();
@@ -315,7 +331,7 @@ mod tests {
 
     #[test]
     fn test_flipping_loop_with_two_delays() {
-        let mut sim = Simulation::default();
+        let mut sim = SimulationEngine::default();
         let [first, second] = sim.add_array_wired_loop([Delay, Delay]);
 
         sim.set_value(first, true);
@@ -329,7 +345,7 @@ mod tests {
 
     #[test]
     fn test_flipping_loop_with_not_and_delay() {
-        let mut sim = Simulation::default();
+        let mut sim = SimulationEngine::default();
         let [not, delay] = sim.add_array_wired_loop([Not, Delay]);
 
         for i in 0..100 {
@@ -341,7 +357,7 @@ mod tests {
 
     #[test]
     fn test_loop_with_three_delays() {
-        let mut sim = Simulation::default();
+        let mut sim = SimulationEngine::default();
         let [delay_1, delay_2, delay_3] = sim.add_array_wired_loop_of(Delay);
         sim.set_value(delay_1, true);
 
@@ -365,7 +381,7 @@ mod tests {
 
     #[test]
     fn test_loop_circuit_with_consecutive_nots_and_delays() {
-        let mut sim = Simulation::default();
+        let mut sim = SimulationEngine::default();
         let [not_1, not_2, not_3, delay_1, delay_2] =
             sim.add_array_wired_loop([Not, Not, Not, Delay, Delay]);
 
@@ -402,7 +418,7 @@ mod tests {
 
     #[test]
     fn test_loop_circuit_with_consecutive_nots_and_delays_stable() {
-        let mut sim = Simulation::default();
+        let mut sim = SimulationEngine::default();
         let [not_1, not_2, not_3, not_4, delay_1, delay_2] =
             sim.add_array_wired_loop([Not, Not, Not, Not, Delay, Delay]);
 
@@ -420,7 +436,7 @@ mod tests {
     #[test]
     fn test_and() {
         let new_sim = || {
-            let mut sim = Simulation::default();
+            let mut sim = SimulationEngine::default();
             let [not, and] = sim.add_array([Not, And(2)]);
             (sim, not, and)
         };
@@ -449,7 +465,7 @@ mod tests {
     #[test]
     fn test_half_adder() {
         let new_sim = || {
-            let mut sim = Simulation::default();
+            let mut sim = SimulationEngine::default();
             let [not, half_adder] = sim.add_array([Not, HalfAdder]);
             (sim, not, half_adder)
         };
@@ -482,7 +498,7 @@ mod tests {
     #[test]
     fn test_full_adder() {
         let new_sim = || {
-            let mut sim = Simulation::default();
+            let mut sim = SimulationEngine::default();
             let [not, full_adder] = sim.add_array([Not, FullAdder]);
             (sim, not, full_adder)
         };

@@ -1,2 +1,6 @@
 [workspace]
 members = ["firestone_gdext", "simulation_engine"]
+resolver = "3"
+
+[workspace.dependencies]
+rustc-hash = "2.1.1"

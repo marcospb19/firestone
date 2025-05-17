@@ -8,3 +8,5 @@ crate-type = ["cdylib"]
 
 [dependencies]
 godot = { git = "https://github.com/godot-rust/gdext", rev = "4d2251bbd669c7d252c04b90738d42089483fb51" }
+rustc-hash.workspace = true
+simulation_engine = { path = "../simulation_engine" }

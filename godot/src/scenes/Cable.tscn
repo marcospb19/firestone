@@ -1,7 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://c48ivbbd1xjtm"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0ulqx"]
-
-[node name="Cable" type="CSGBox3D"]
-size = Vector3(0.1, 0.1, 1)
-material = SubResource("StandardMaterial3D_0ulqx")

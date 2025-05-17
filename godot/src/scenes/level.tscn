@@ -19,6 +19,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25787, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
 
+[node name="CircuitSimulation" type="CircuitSimulation" parent="."]
+
 [connection signal="add_block" from="Player" to="." method="add_block_at_world_offset"]
 [connection signal="connect_faces" from="Player" to="." method="_on_player_connect_faces"]
 [connection signal="remove_block" from="Player" to="." method="remove_block_at_world_offset"]
