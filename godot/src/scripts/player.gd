@@ -36,7 +36,7 @@ var pending_connection_face = null
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	Engine.max_fps = 240
+	Engine.max_fps = int(DisplayServer.screen_get_refresh_rate() + Utils.EPSILON)
 	Utils.set_main_camera(camera)
 	edit_block_timer = self.get_tree().create_timer(0)
 	is_flying_toggle_timer = self.get_tree().create_timer(0)
