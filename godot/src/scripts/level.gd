@@ -21,7 +21,7 @@ func _ready():
 					coordinate -= DIMENSIONS / 2 # centralize
 					#coordinate.z -= DIMENSIONS.z / 1.8 + 5
 					coordinate.y -= 2
-					add_block_at(coordinate, VoxelWorld.FaceKind.DIRT)
+					add_block_at(coordinate, VoxelWorld.FaceKind.STONE)
 
 func add_block_at_world_offset(pos: Vector3, face_kind: VoxelWorld.FaceKind, look_direction: Vector3):
 	add_block_at(position_to_coordinate(pos), face_kind, look_direction)

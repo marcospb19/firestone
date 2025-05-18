@@ -6,24 +6,30 @@ enum Face { FRONT, RIGHT, BACK, LEFT, TOP, BOTTOM }
 enum FaceKind {
 	DIRT,
 	STONE,
-	AND_BLANK,
-	AND_INPUT,
-	AND_OUTPUT,
 	NOT_BLANK,
 	NOT_INPUT,
 	NOT_OUTPUT,
+	AND_BLANK,
+	AND_INPUT,
+	AND_OUTPUT,
+	OR_BLANK,
+	OR_INPUT,
+	OR_OUTPUT,
 }
 const BLOCKS_MATERIAL: StandardMaterial3D = preload("res://src/materials/blocks_material.tres")
 
 const BLOCKS_TEXTURE_UV_OFFSET: Dictionary[FaceKind, Vector2] = {
 	FaceKind.DIRT: Vector2(0.0, 0.0),
 	FaceKind.STONE: Vector2(0.25, 0.0),
-	FaceKind.AND_BLANK: Vector2(0.0, 0.25),
-	FaceKind.AND_INPUT: Vector2(0.25, 0.25),
-	FaceKind.AND_OUTPUT: Vector2(0.5, 0.25),
-	FaceKind.NOT_BLANK: Vector2(0.0, 0.5),
-	FaceKind.NOT_INPUT: Vector2(0.25, 0.5),
-	FaceKind.NOT_OUTPUT: Vector2(0.5, 0.5),
+	FaceKind.NOT_BLANK: Vector2(0.0, 0.25),
+	FaceKind.NOT_INPUT: Vector2(0.25, 0.25),
+	FaceKind.NOT_OUTPUT: Vector2(0.5, 0.25),
+	FaceKind.AND_BLANK: Vector2(0.0, 0.5),
+	FaceKind.AND_INPUT: Vector2(0.25, 0.5),
+	FaceKind.AND_OUTPUT: Vector2(0.5, 0.5),
+	FaceKind.OR_BLANK: Vector2(0.0, 0.75),
+	FaceKind.OR_INPUT: Vector2(0.25, 0.75),
+	FaceKind.OR_OUTPUT: Vector2(0.5, 0.75),
 }
 const VERTICES_PER_BLOCK := 6 * 6
 const FACE_TRIANGLES: Dictionary[Face, Array] = {
@@ -196,14 +202,14 @@ static func is_kind_gate(kind: FaceKind) -> bool:
 
 static func is_kind_input(kind: FaceKind) -> bool:
 	match kind:
-		FaceKind.AND_INPUT, FaceKind.NOT_INPUT:
+		FaceKind.NOT_INPUT, FaceKind.AND_INPUT, FaceKind.OR_INPUT:
 			return true
 		_:
 			return false
 
 static func is_kind_output(kind: FaceKind) -> bool:
 	match kind:
-		FaceKind.AND_OUTPUT, FaceKind.NOT_OUTPUT:
+		FaceKind.NOT_OUTPUT, FaceKind.AND_OUTPUT, FaceKind.OR_OUTPUT:
 			return true
 		_:
 			return false

@@ -1,29 +1,36 @@
 extends Control
 
-@onready var unpaused_hud: Control = $UnpausedHUD
 @onready var toolbar_selection: TextureRect = $FixedHUD/ToolbarSelectionSquare
-@onready var options_menu: Control = $OptionsMenu
 
-var is_menu_open := false:
+var f1_hide_hud := false:
 	set(value):
-		is_menu_open = value
-		options_menu.visible = value
-		unpaused_hud.visible = not value
-		if is_menu_open:
+		f1_hide_hud = value
+		update_visibility()
+
+var is_esc_menu_open := false:
+	set(value):
+		is_esc_menu_open = value
+		update_visibility()
+
+func update_visibility():
+		$OptionsMenu.visible = is_esc_menu_open
+		$UnpausedHUD.visible = not is_esc_menu_open and not f1_hide_hud
+		$FixedHUD.visible = not f1_hide_hud
+		if is_esc_menu_open:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		else:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _notification(what):
 	if what == MainLoop.NOTIFICATION_APPLICATION_FOCUS_OUT:
-		is_menu_open = true
+		is_esc_menu_open = true
 
 func _process(_delta):
 	if Input.is_action_just_pressed("escape"):
-		is_menu_open = not is_menu_open
+		is_esc_menu_open = not is_esc_menu_open
 
 func _on_resume_button_pressed():
-	is_menu_open = false
+	is_esc_menu_open = false
 
 func _on_quit_button_pressed():
 	SceneController.quit()

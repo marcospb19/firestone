@@ -1,19 +1,29 @@
-[gd_scene load_steps=2 format=3 uid="uid://dch0wy1f03eim"]
+[gd_scene load_steps=5 format=3 uid="uid://dch0wy1f03eim"]
+
+[ext_resource type="Shader" uid="uid://d3den14uvljuy" path="res://src/shaders/sky.gdshader" id="1_wlqrc"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_x32ix"]
+shader = ExtResource("1_wlqrc")
+
+[sub_resource type="Sky" id="Sky_3vlxe"]
+sky_material = SubResource("ShaderMaterial_x32ix")
 
 [sub_resource type="Environment" id="Environment_elqe6"]
-background_mode = 1
-background_color = Color(0.295, 0.403167, 0.59, 1)
+background_mode = 2
+background_color = Color(0.41, 0.41, 0.41, 1)
+sky = SubResource("Sky_3vlxe")
+ambient_light_source = 3
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_sky_contribution = 0.0
+tonemap_mode = 2
+ssao_enabled = true
+ssao_intensity = 2.5
+ssao_power = 1.75
 
 [node name="Node3D" type="Node3D"]
 
 [node name="Environment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_elqe6")
 
-[node name="Sun" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.926138, -0.316544, 0.205103, 0.00120015, 0.546246, 0.837624, -0.377182, -0.77551, 0.506279, 0, 0, 0)
-light_color = Color(1, 0.9, 0.8, 1)
-light_energy = 0.55
-light_bake_mode = 1
-shadow_enabled = true
-shadow_opacity = 0.75
-sky_mode = 1
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+sky_mode = 2

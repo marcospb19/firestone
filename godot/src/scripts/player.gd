@@ -71,11 +71,15 @@ func _input(event):
 
 func _physics_process(delta: float):
 	if Utils.is_mouse_captured():
-		if Input.is_action_just_pressed("reset"):
+		if Input.is_action_just_pressed("f1"):
+			$InGameUI.f1_hide_hud = not $InGameUI.f1_hide_hud
+
+
+		if Input.is_action_just_pressed("r"):
 			reset_position.emit()
 		handle_movement(delta)
 		handle_mouse_clicks()
-		if Input.is_action_just_pressed("paint-face"):
+		if Input.is_action_just_pressed("e"):
 			raycast.force_raycast_update()
 			if raycast.is_colliding():
 				var normal = raycast.get_collision_normal()
