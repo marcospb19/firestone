@@ -74,26 +74,11 @@ func _physics_process(delta: float):
 	if Utils.is_mouse_captured():
 		if Input.is_action_just_pressed("f1"):
 			$InGameUI.f1_hide_hud = not $InGameUI.f1_hide_hud
-
-
 		if Input.is_action_just_pressed("r"):
 			reset_position.emit()
 		handle_movement(delta)
-		handle_mouse_clicks()
-		if Input.is_action_just_pressed("e"):
-			raycast.force_raycast_update()
-			if raycast.is_colliding():
-				var normal = raycast.get_collision_normal()
-				var point = raycast.get_collision_point() - normal * 0.01
-				var face = VoxelWorld.FACE_NORMALS_REVERSED[Vector3i(normal)]
-				if pending_connection_face == null:
-					pending_connection_face = face
-					pending_connection_pos = point
-				else:
-					connect_faces.emit(pending_connection_pos, pending_connection_face, point, face)
-					pending_connection_face = null
-					pending_connection_pos = null
-
+		handle_block_manipulation()
+		handle_block_connecting()
 		handle_zooming()
 	self.move_and_slide()
 
@@ -124,12 +109,27 @@ func handle_movement(delta: float):
 		velocity.z *= RUN_SPEED_MULTIPLIER
 	velocity = transform.basis * velocity
 
+func handle_block_connecting():
+	if Input.is_action_just_pressed("e"):
+		raycast.force_raycast_update()
+		if raycast.is_colliding():
+			var normal = raycast.get_collision_normal()
+			var point = raycast.get_collision_point() - normal * 0.01
+			var face = VoxelWorld.FACE_NORMALS_REVERSED[Vector3i(normal)]
+			if pending_connection_face == null:
+				pending_connection_face = face
+				pending_connection_pos = point
+			else:
+				connect_faces.emit(pending_connection_pos, pending_connection_face, point, face)
+				pending_connection_face = null
+				pending_connection_pos = null
+
 var is_fast_removing := false
 var is_fast_adding := false
 # If player holds to add blocks, make sure they're all facing the same direction
 var add_block_look_direction
 
-func handle_mouse_clicks():
+func handle_block_manipulation():
 	var left = Input.is_action_pressed("mouse-left")
 	var right = Input.is_action_pressed("mouse-right")
 	var pressed_left = Input.is_action_just_pressed("mouse-left")

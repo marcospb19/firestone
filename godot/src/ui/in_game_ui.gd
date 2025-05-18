@@ -26,7 +26,7 @@ func _notification(what):
 		is_esc_menu_open = true
 
 func _process(_delta):
-	if Input.is_action_just_pressed("escape"):
+	if Input.is_action_just_pressed("esc"):
 		is_esc_menu_open = not is_esc_menu_open
 
 func _on_resume_button_pressed():
