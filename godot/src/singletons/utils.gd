@@ -2,6 +2,7 @@ extends Node
 
 const BLOCK_WIDTH := 1.00
 const EPSILON := 0.00001
+const MILLI := 0.001
 
 var main_camera: Camera3D
 var elapsed_delta := 0.0

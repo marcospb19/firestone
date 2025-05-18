@@ -20,7 +20,7 @@ ssao_enabled = true
 ssao_intensity = 2.5
 ssao_power = 1.75
 
-[node name="Node3D" type="Node3D"]
+[node name="EnvironmentRoot" type="Node3D"]
 
 [node name="Environment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_elqe6")

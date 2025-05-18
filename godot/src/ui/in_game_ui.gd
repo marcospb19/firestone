@@ -1,6 +1,6 @@
 extends Control
 
-@onready var toolbar_selection: TextureRect = $FixedHUD/ToolbarSelectionSquare
+@onready var hotbar_selection: TextureRect = $FixedHUD/HotbarSelectionSquare
 
 var f1_hide_hud := false:
 	set(value):
@@ -35,9 +35,13 @@ func _on_resume_button_pressed():
 func _on_quit_button_pressed():
 	SceneController.quit()
 
-func update_selected_block(value: int):
-	const TEXTURE_SIZE = 22
+const TEXTURE_SIZE = 22
+
+func update_selected_block(index: int):
+	var selected_offset = get_element_offset(index)
+	hotbar_selection.offset_left = selected_offset - TEXTURE_SIZE * 2.0
+	hotbar_selection.offset_right = selected_offset + TEXTURE_SIZE * 2.0
+
+func get_element_offset(index: int):
 	const SQUARE_OVERFLOW = 2
-	var selection_offset = ((TEXTURE_SIZE - SQUARE_OVERFLOW) * 4) * (value - 4)
-	toolbar_selection.offset_left = selection_offset - TEXTURE_SIZE * 2.0
-	toolbar_selection.offset_right = selection_offset + TEXTURE_SIZE * 2.0
+	return ((TEXTURE_SIZE - SQUARE_OVERFLOW) * 4) * (index - 4)

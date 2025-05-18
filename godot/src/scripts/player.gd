@@ -15,13 +15,10 @@ const FLYING_SPEED_MULTIPLIER := 1.4
 
 const DOUBLE_JUMP_TOGGLE_DELAY := 0.3
 const BLOCK_PLACE_DELAY := 0.2
-const BLOCK_FAST_PLACE_DELAY := 0.2 / 3.0
+const BLOCK_FAST_PLACE_DELAY := BLOCK_PLACE_DELAY / 3.0
 const COOLDOWN_AFTER_FAST_PLACE := 0.5
 const MOUSE_SENSITIVITY := 0.00065
 
-var health := 100
-var movement_velocity: Vector3
-var is_running := false
 var edit_block_timer: SceneTreeTimer
 var is_flying := true
 var is_flying_toggle_timer: SceneTreeTimer
@@ -36,10 +33,11 @@ var pending_connection_face = null
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	Engine.max_fps = int(DisplayServer.screen_get_refresh_rate() + Utils.EPSILON)
+	Engine.max_fps = Utils2.refresh_rate_to_fps(DisplayServer.screen_get_refresh_rate())
 	Utils.set_main_camera(camera)
 	edit_block_timer = self.get_tree().create_timer(0)
 	is_flying_toggle_timer = self.get_tree().create_timer(0)
+	Input.set_use_accumulated_input(false)
 
 func _input(event):
 	if not Utils.is_mouse_captured():
@@ -56,7 +54,7 @@ func _input(event):
 		hotbar.handle_input_event(event)
 		$InGameUI.update_selected_block(hotbar.get_selected_index())
 
-func _physics_process(delta: float):
+func _process(delta: float):
 	apply_gravity(delta)
 	if Utils.is_mouse_captured():
 		if Input.is_action_just_pressed("f1"):

@@ -36,6 +36,12 @@ impl Utils2 {
     }
 
     #[func]
+    fn refresh_rate_to_fps(refresh_rate: f32) -> u32 {
+        godot_print!("refresh rate: {}", refresh_rate);
+        refresh_rate as u32 + (refresh_rate.fract() > f32::EPSILON) as u32
+    }
+
+    #[func]
     fn repeat(variant: Variant, times: u32) -> Array<Variant> {
         let mut array = Array::new();
         for _ in 0..times {

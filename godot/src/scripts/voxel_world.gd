@@ -1,6 +1,7 @@
 class_name VoxelWorld extends MeshInstance3D
 
 signal updated
+const MESH_UPDATE_INTERVAL := 1.0 / 120.0
 
 enum Face { FRONT, RIGHT, BACK, LEFT, TOP, BOTTOM }
 enum FaceKind {
@@ -176,11 +177,12 @@ func update_face_uv(coords: Vector3i, face: Face, face_kind: FaceKind):
 
 func enqueue_mesh_update():
 	if not update_pending and not disable_updates:
-		if not $UpdateTimer.is_stopped() or $UpdateTimer.time_left > 0.05:
+		var need_to_wait = not $UpdateTimer.is_stopped() and $UpdateTimer.time_left > Utils.MILLI
+		if need_to_wait:
 			update_pending = true
 			await $UpdateTimer.timeout
 			update_pending = false
-		$UpdateTimer.start(0.05)
+		$UpdateTimer.start(1.0 / 120.0)
 		$UpdateTimer.paused = false
 
 		mesh.clear_surfaces()
