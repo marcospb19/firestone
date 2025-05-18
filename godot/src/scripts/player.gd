@@ -27,15 +27,10 @@ var is_flying := true
 var is_flying_toggle_timer: SceneTreeTimer
 var is_zooming := false
 var hotbar := Hotbar.new() # Tells what blocks are in what position, not the best abstraction
-var selected_block: int:
-	set(value):
-		selected_block = value
-		ui.update_selected_block(value)
 
 var pending_connection_pos = null
 var pending_connection_face = null
 
-@onready var ui = $InGameUI
 @onready var camera: Camera3D = $Head/Camera
 @onready var raycast: RayCast3D = $Head/Camera/RayCast
 
@@ -45,7 +40,6 @@ func _ready():
 	Utils.set_main_camera(camera)
 	edit_block_timer = self.get_tree().create_timer(0)
 	is_flying_toggle_timer = self.get_tree().create_timer(0)
-	selected_block = 0
 
 func _input(event):
 	if not Utils.is_mouse_captured():
@@ -56,18 +50,11 @@ func _input(event):
 		rotation.y -= rotation_diff.x
 		# By not looking straight down or up, we can always tell what direction the user is facing
 		# this is useful to know how to orient placed blocks
-		const VERTICAL_LIMIT := deg_to_rad(90.0 - 0.00001)
+		const VERTICAL_LIMIT := deg_to_rad(90.0 - Utils.EPSILON)
 		camera.rotation.x = clampf(camera.rotation.x - rotation_diff.y, -VERTICAL_LIMIT, VERTICAL_LIMIT)
 	elif event.is_pressed():
-		if event is InputEventMouseButton:
-			if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-				selected_block = (selected_block + 1) % 9
-			elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
-				selected_block = (selected_block + 8) % 9
-		elif event is InputEventKey:
-			var number = int(event.as_text_keycode()) # crazy conversion
-			if number >= 1:
-				selected_block = number - 1
+		hotbar.handle_input_event(event)
+		$InGameUI.update_selected_block(hotbar.get_selected_index())
 
 func _physics_process(delta: float):
 	apply_gravity(delta)
@@ -76,13 +63,13 @@ func _physics_process(delta: float):
 			$InGameUI.f1_hide_hud = not $InGameUI.f1_hide_hud
 		if Input.is_action_just_pressed("r"):
 			reset_position.emit()
-		handle_movement(delta)
+		handle_movement()
 		handle_block_manipulation()
 		handle_block_connecting()
 		handle_zooming()
 	self.move_and_slide()
 
-func handle_movement(delta: float):
+func handle_movement():
 	if Input.is_action_just_pressed("jump"):
 		if is_flying_toggle_timer.time_left > 0.0:
 			is_flying = not is_flying
@@ -178,7 +165,7 @@ func try_edit_block(fast: bool, is_add: bool):
 	var point = raycast.get_collision_point()
 	var normal = raycast.get_collision_normal()
 	if is_add:
-		var block = hotbar.access(selected_block)
+		var block = hotbar.get_selected()
 		if block == null:
 			return
 		add_block.emit(point + normal * 0.01, block, add_block_look_direction)

@@ -1,4 +1,8 @@
-use godot::{classes::Engine, prelude::*};
+use godot::{
+    classes::{Engine, InputEventKey},
+    global::Key,
+    prelude::*,
+};
 use rustc_hash::FxHashMap;
 use simulation_engine::{ComponentId, ComponentKind, SimulationEngine};
 
@@ -13,6 +17,23 @@ struct Utils2 {
 #[godot_api]
 impl Utils2 {
     const NAME: &str = "Utils2";
+
+    #[func]
+    fn parse_hotbar_number(key: Gd<InputEventKey>) -> Variant {
+        match key.get_keycode() {
+            Key::KEY_0 => 0.to_variant(),
+            Key::KEY_1 => 1.to_variant(),
+            Key::KEY_2 => 2.to_variant(),
+            Key::KEY_3 => 3.to_variant(),
+            Key::KEY_4 => 4.to_variant(),
+            Key::KEY_5 => 5.to_variant(),
+            Key::KEY_6 => 6.to_variant(),
+            Key::KEY_7 => 7.to_variant(),
+            Key::KEY_8 => 8.to_variant(),
+            Key::KEY_9 => 9.to_variant(),
+            _ => Variant::nil(),
+        }
+    }
 
     #[func]
     fn repeat(variant: Variant, times: u32) -> Array<Variant> {
