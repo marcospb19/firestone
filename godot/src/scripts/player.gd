@@ -70,6 +70,7 @@ func _input(event):
 				selected_block = number - 1
 
 func _physics_process(delta: float):
+	apply_gravity(delta)
 	if Utils.is_mouse_captured():
 		if Input.is_action_just_pressed("f1"):
 			$InGameUI.f1_hide_hud = not $InGameUI.f1_hide_hud
@@ -106,7 +107,6 @@ func handle_movement(delta: float):
 		var y_multiplier = int(Input.is_action_pressed("jump")) - int(Input.is_action_pressed("ctrl"))
 		velocity.y = jump_strength * y_multiplier
 	else:
-		velocity.y -= gravity * delta
 		if self.is_on_floor():
 			velocity.y = 0.0
 			if Input.is_action_pressed("jump"):
@@ -201,3 +201,7 @@ func handle_zooming():
 			assert(previous_fov != null)
 			camera.set_fov(previous_fov)
 			previous_fov = null
+
+func apply_gravity(delta: float):
+	if not is_flying:
+		velocity.y -= gravity * delta
