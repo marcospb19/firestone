@@ -21,7 +21,6 @@ impl Utils2 {
     #[func]
     fn parse_hotbar_number(key: Gd<InputEventKey>) -> Variant {
         match key.get_keycode() {
-            Key::KEY_0 => 0.to_variant(),
             Key::KEY_1 => 1.to_variant(),
             Key::KEY_2 => 2.to_variant(),
             Key::KEY_3 => 3.to_variant(),

@@ -216,6 +216,13 @@ static func is_kind_output(kind: FaceKind) -> bool:
 		_:
 			return false
 
+static func is_kind_blank(kind: FaceKind) -> bool:
+	match kind:
+		FaceKind.NOT_BLANK, FaceKind.AND_BLANK, FaceKind.OR_BLANK:
+			return true
+		_:
+			return false
+
 static func blank_to_input(kind: FaceKind) -> FaceKind:
 	return (kind + 1) as FaceKind
 

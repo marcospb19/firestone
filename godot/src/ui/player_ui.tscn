@@ -1,20 +1,20 @@
 [gd_scene load_steps=7 format=3 uid="uid://bsx1usq366uih"]
 
-[ext_resource type="Script" uid="uid://dcdowglvd2oyi" path="res://src/ui/in_game_ui.gd" id="1_6al0f"]
-[ext_resource type="Texture2D" uid="uid://ogyonerhuxqq" path="res://assets/crosshair.png" id="3_73s3q"]
-[ext_resource type="Texture2D" uid="uid://5kxw7b5ombpr" path="res://assets/hotbar.png" id="3_gtd8h"]
-[ext_resource type="Script" uid="uid://lblaiw3aanud" path="res://src/ui/options_menu.gd" id="4_8cb5d"]
-[ext_resource type="Texture2D" uid="uid://vocvmjj7kt4g" path="res://assets/hotbar_selection.png" id="4_37e62"]
-[ext_resource type="Script" uid="uid://cnld5vsyaf5i6" path="res://src/ui/style/appliers/buttons_applier.gd" id="6_3i5ob"]
+[ext_resource type="Script" uid="uid://dcdowglvd2oyi" path="res://src/ui/player_ui.gd" id="1_2wqvo"]
+[ext_resource type="Texture2D" uid="uid://ogyonerhuxqq" path="res://assets/crosshair.png" id="2_xntci"]
+[ext_resource type="Texture2D" uid="uid://5kxw7b5ombpr" path="res://assets/hotbar.png" id="3_olmyv"]
+[ext_resource type="Texture2D" uid="uid://vocvmjj7kt4g" path="res://assets/hotbar_selection.png" id="4_iik2x"]
+[ext_resource type="Script" uid="uid://lblaiw3aanud" path="res://src/ui/options_menu.gd" id="5_xl7ia"]
+[ext_resource type="Script" uid="uid://cnld5vsyaf5i6" path="res://src/ui/style/appliers/buttons_applier.gd" id="6_08fqo"]
 
-[node name="InGameUI" type="Control"]
+[node name="PlayerUI" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_6al0f")
+script = ExtResource("1_2wqvo")
 
 [node name="UnpausedHUD" type="Control" parent="."]
 layout_mode = 1
@@ -35,7 +35,7 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-texture = ExtResource("3_73s3q")
+texture = ExtResource("2_xntci")
 
 [node name="FixedHUD" type="Control" parent="."]
 layout_mode = 1
@@ -59,7 +59,7 @@ grow_horizontal = 2
 grow_vertical = 0
 size_flags_horizontal = 4
 size_flags_vertical = 4
-texture = ExtResource("3_gtd8h")
+texture = ExtResource("3_olmyv")
 
 [node name="HotbarSelectionSquare" type="TextureRect" parent="FixedHUD"]
 layout_mode = 1
@@ -75,12 +75,9 @@ grow_horizontal = 2
 grow_vertical = 0
 size_flags_horizontal = 4
 size_flags_vertical = 4
-texture = ExtResource("4_37e62")
+texture = ExtResource("4_iik2x")
 
-[node name="HotbarPreviews" type="Control" parent="FixedHUD"]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="hotbarPreviewcontainer" type="Node" parent="FixedHUD"]
 
 [node name="OptionsMenu" type="Control" parent="."]
 visible = false
@@ -90,7 +87,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("4_8cb5d")
+script = ExtResource("5_xl7ia")
 
 [node name="BackgroundColor" type="ColorRect" parent="OptionsMenu"]
 layout_mode = 1
@@ -114,7 +111,7 @@ offset_right = 71.0
 offset_bottom = 33.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("6_3i5ob")
+script = ExtResource("6_08fqo")
 
 [node name="ResumeButton" type="Button" parent="OptionsMenu/Buttons"]
 layout_mode = 2

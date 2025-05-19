@@ -18,13 +18,18 @@ func get_selected():
 func get_selected_index():
 	return __selected_index
 
-func handle_input_event(event: InputEvent):
+## Returns whether the event was treated or ignored
+func handle_input_event(event: InputEvent) -> bool:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			__selected_index = (__selected_index + 1) % 9
+			return true
 		elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
 			__selected_index = (__selected_index + 8) % 9
+			return true
 	elif event is InputEventKey:
 		var number = Utils2.parse_hotbar_number(event)
 		if number != null:
 			__selected_index = number - 1
+			return true
+	return false

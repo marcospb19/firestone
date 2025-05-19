@@ -30,6 +30,7 @@ var pending_connection_face = null
 
 @onready var camera: Camera3D = $Head/Camera
 @onready var raycast: RayCast3D = $Head/Camera/RayCast
+@onready var player_ui: Control = $PlayerUI
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -38,6 +39,8 @@ func _ready():
 	edit_block_timer = self.get_tree().create_timer(0)
 	is_flying_toggle_timer = self.get_tree().create_timer(0)
 	Input.set_use_accumulated_input(false)
+	for i in hotbar.HOTBAR_ELEMENTS.size():
+		player_ui.update_hotbar_preview(i, hotbar.HOTBAR_ELEMENTS[i])
 
 func _input(event):
 	if not Utils.is_mouse_captured():
@@ -51,14 +54,14 @@ func _input(event):
 		const VERTICAL_LIMIT := deg_to_rad(90.0 - Utils.EPSILON)
 		camera.rotation.x = clampf(camera.rotation.x - rotation_diff.y, -VERTICAL_LIMIT, VERTICAL_LIMIT)
 	elif event.is_pressed():
-		hotbar.handle_input_event(event)
-		$InGameUI.update_selected_block(hotbar.get_selected_index())
+		if hotbar.handle_input_event(event):
+			player_ui.update_selected_block(hotbar.get_selected_index())
 
 func _process(delta: float):
 	apply_gravity(delta)
 	if Utils.is_mouse_captured():
 		if Input.is_action_just_pressed("f1"):
-			$InGameUI.f1_hide_hud = not $InGameUI.f1_hide_hud
+			player_ui.f1_hide_hud = not player_ui.f1_hide_hud
 		if Input.is_action_just_pressed("r"):
 			reset_position.emit()
 		handle_movement()
