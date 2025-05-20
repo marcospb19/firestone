@@ -16,7 +16,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_2wqvo")
 
-[node name="UnpausedHUD" type="Control" parent="."]
+[node name="Hotbar" type="Control" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -24,28 +24,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Crosshair" type="TextureRect" parent="UnpausedHUD"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-texture = ExtResource("2_xntci")
-
-[node name="FixedHUD" type="Control" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Hotbar" type="TextureRect" parent="FixedHUD"]
+[node name="BackgroundRect" type="TextureRect" parent="Hotbar"]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -61,7 +40,7 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 texture = ExtResource("3_olmyv")
 
-[node name="HotbarSelectionSquare" type="TextureRect" parent="FixedHUD"]
+[node name="SelectionRect" type="TextureRect" parent="Hotbar"]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -77,7 +56,20 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 texture = ExtResource("4_iik2x")
 
-[node name="hotbarPreviewcontainer" type="Node" parent="FixedHUD"]
+[node name="PreviewsContainer" type="Control" parent="Hotbar"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -364.0
+offset_top = -88.0
+offset_right = 364.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 4
+size_flags_vertical = 4
 
 [node name="OptionsMenu" type="Control" parent="."]
 visible = false
@@ -122,6 +114,23 @@ text = "Resume"
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Quit"
+
+[node name="Crosshair" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("2_xntci")
 
 [connection signal="pressed" from="OptionsMenu/Buttons/ResumeButton" to="." method="_on_resume_button_pressed"]
 [connection signal="pressed" from="OptionsMenu/Buttons/QuitButton" to="." method="_on_quit_button_pressed"]
