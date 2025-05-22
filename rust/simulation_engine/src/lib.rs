@@ -113,20 +113,22 @@ impl SimulationEngine {
         self.wire(parent, child, 0, 0);
     }
 
+    /// Returns whether is succeeded
     pub fn wire(
         &mut self,
         parent: ComponentId,
         child: ComponentId,
         parent_output: usize,
         child_input: usize,
-    ) {
+    ) -> bool {
         let parent_kind = self.nodes.get(&parent).expect("unexpected parent").kind;
         let child_kind = self.nodes.get(&child).expect("unexpected parent").kind;
 
         if !parent_kind.is_delay() && !child_kind.is_delay() {
-            self.tickless_dag
-                .try_update_edge(parent, child, ())
-                .expect("detected cycle");
+            let result = self.tickless_dag.try_update_edge(parent, child, ());
+            if result.is_err() {
+                return false;
+            }
         }
 
         let edge = Edge {
@@ -148,6 +150,7 @@ impl SimulationEngine {
             .entry(parent)
             .or_default()
             .insert(edge);
+        true
     }
 
     pub fn run_step(&mut self) {

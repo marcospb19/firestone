@@ -108,7 +108,13 @@ impl INode for CircuitSimulation {
 #[godot_api]
 impl CircuitSimulation {
     #[func]
-    fn connect_blocks(&mut self, from: Vector3i, to: Vector3i, is_from_and: bool, is_to_and: bool) {
+    fn connect_blocks(
+        &mut self,
+        from: Vector3i,
+        to: Vector3i,
+        is_from_and: bool,
+        is_to_and: bool,
+    ) -> bool {
         godot_print!("connected blocks");
         let from_kind = if is_from_and {
             ComponentKind::And(2)
@@ -143,6 +149,6 @@ impl CircuitSimulation {
                 id
             });
 
-        self.engine.wire(from_id, to_id, 0, 0);
+        self.engine.wire(from_id, to_id, 0, 0)
     }
 }

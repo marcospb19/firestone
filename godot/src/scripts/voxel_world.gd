@@ -17,6 +17,13 @@ enum FaceKind {
 	OR_INPUT,
 	OR_OUTPUT,
 }
+enum BlockKind {
+	DIRT,
+	STONE,
+	NOT,
+	AND,
+	OR,
+}
 const BLOCKS_MATERIAL: StandardMaterial3D = preload("res://src/materials/blocks_material.tres")
 
 const BLOCKS_TEXTURE_UV_OFFSET: Dictionary[FaceKind, Vector2] = {
@@ -82,20 +89,37 @@ var block_positions := PackedVector3Array() # Used as a stack
 class BlockInfo:
 	var index: int
 	var face_kinds: Array[FaceKind]
+	var block_kind: BlockKind
+	var output_face: Face
+	var input_face: Face
 
-	func _init(index_: int, face_kinds_: Array[FaceKind]):
+	func _init(index_: int, block_kind_: BlockKind, face_kinds_: Array[FaceKind]):
 		index = index_
 		face_kinds = face_kinds_
+		block_kind = block_kind_
 
 func _init():
 	mesh = ArrayMesh.new()
 	surface_array.resize(Mesh.ARRAY_MAX)
 
+# TODO: this function should receive BlockKind
 func add_block(pos: Vector3i, face_kind: FaceKind):
 	if blocks.has(pos):
 		remove_block(pos)
 
-	blocks[pos] = BlockInfo.new(blocks.size(), face_kind_repeat_array(face_kind))
+	var block_kind = null
+	match face_kind:
+		FaceKind.DIRT:
+			block_kind = BlockKind.DIRT
+		FaceKind.STONE:
+			block_kind = BlockKind.STONE
+		FaceKind.NOT_BLANK, FaceKind.NOT_INPUT, FaceKind.NOT_OUTPUT:
+			block_kind = BlockKind.NOT
+		FaceKind.AND_BLANK, FaceKind.AND_INPUT, FaceKind.AND_OUTPUT:
+			block_kind = BlockKind.AND
+		FaceKind.OR_BLANK, FaceKind.OR_INPUT, FaceKind.OR_OUTPUT:
+			block_kind = BlockKind.OR
+	blocks[pos] = BlockInfo.new(blocks.size(), block_kind, face_kind_repeat_array(face_kind))
 	block_positions.append(pos)
 
 	var uv_offset = BLOCKS_TEXTURE_UV_OFFSET[face_kind]
@@ -195,33 +219,39 @@ func enqueue_mesh_update():
 		mesh.surface_set_material(0, BLOCKS_MATERIAL)
 		updated.emit()
 
-static func is_kind_gate(kind: FaceKind) -> bool:
+static func is_face_gate(kind: FaceKind) -> bool:
 	match kind:
 		FaceKind.DIRT, FaceKind.STONE:
 			return false
 		_:
 			return true
 
-static func is_kind_input(kind: FaceKind) -> bool:
+static func is_face_input(kind: FaceKind) -> bool:
 	match kind:
 		FaceKind.NOT_INPUT, FaceKind.AND_INPUT, FaceKind.OR_INPUT:
 			return true
 		_:
 			return false
 
-static func is_kind_output(kind: FaceKind) -> bool:
+static func is_face_output(kind: FaceKind) -> bool:
 	match kind:
 		FaceKind.NOT_OUTPUT, FaceKind.AND_OUTPUT, FaceKind.OR_OUTPUT:
 			return true
 		_:
 			return false
 
-static func is_kind_blank(kind: FaceKind) -> bool:
+static func is_face_blank(kind: FaceKind) -> bool:
 	match kind:
 		FaceKind.NOT_BLANK, FaceKind.AND_BLANK, FaceKind.OR_BLANK:
 			return true
 		_:
 			return false
+
+static func is_block_gate(block_kind: BlockKind) -> bool:
+	match block_kind:
+		BlockKind.NOT, BlockKind.AND, BlockKind.OR:
+			return true
+	return false
 
 static func blank_to_input(kind: FaceKind) -> FaceKind:
 	return (kind + 1) as FaceKind

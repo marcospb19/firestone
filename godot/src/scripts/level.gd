@@ -14,20 +14,12 @@ func _ready():
 	for x in DIMENSIONS.x:
 		for y in DIMENSIONS.y:
 			for z in DIMENSIONS.z:
-				#var rand = random.get_noise_3d(x, y, z)
-				#if rand >= CUT_OFF:
+				# if random.get_noise_3d(x, y, z) > CUT_OFF:
 				if randf() > CUT_OFF:
 					var coordinate = Vector3i(x, y, z)
 					coordinate -= DIMENSIONS / 2 # centralize
-					#coordinate.z -= DIMENSIONS.z / 1.8 + 5
 					coordinate.y -= 2
 					add_block_at(coordinate, VoxelWorld.FaceKind.STONE)
-
-func add_block_at_world_offset(pos: Vector3, face_kind: VoxelWorld.FaceKind, look_direction: Vector3):
-	add_block_at(position_to_coordinate(pos), face_kind, look_direction)
-
-func remove_block_at_world_offset(pos: Vector3):
-	remove_block_at(position_to_coordinate(pos))
 
 func add_block_at(coordinate: Vector3i, face_kind: VoxelWorld.FaceKind, look_direction: Vector3 = Vector3.FORWARD):
 	# Don't place a block if it collides with the player
@@ -43,20 +35,21 @@ func add_block_at(coordinate: Vector3i, face_kind: VoxelWorld.FaceKind, look_dir
 	$VoxelWorld.disable_updates = true
 	$VoxelWorld.add_block(coordinate, face_kind)
 
-	if VoxelWorld.is_kind_gate(face_kind):
-		$VoxelWorld.update_face_uv($VoxelWorld.block_positions[-1], look_direction_to_face(look_direction), VoxelWorld.blank_to_output(face_kind))
-		$VoxelWorld.update_face_uv($VoxelWorld.block_positions[-1], look_direction_to_face(-look_direction), VoxelWorld.blank_to_input(face_kind))
+	if VoxelWorld.is_face_gate(face_kind):
+		var input_face = look_direction_to_face(-look_direction)
+		var output_face = look_direction_to_face(look_direction)
+		$VoxelWorld.update_face_uv($VoxelWorld.block_positions[-1], input_face, VoxelWorld.blank_to_input(face_kind))
+		$VoxelWorld.update_face_uv($VoxelWorld.block_positions[-1], output_face, VoxelWorld.blank_to_output(face_kind))
+		$VoxelWorld.blocks[Vector3i($VoxelWorld.block_positions[-1])].input_face = input_face
+		$VoxelWorld.blocks[Vector3i($VoxelWorld.block_positions[-1])].output_face = output_face
 	$VoxelWorld.disable_updates = false
 	$VoxelWorld.enqueue_mesh_update()
 
 func remove_block_at(coordinate: Vector3i):
 	$VoxelWorld.remove_block(coordinate)
 
-func _on_player_reset_position():
-	player.position = player_initial_position
-	player.velocity = Vector3.ZERO
-
-func look_direction_to_face(look: Vector3) -> VoxelWorld.Face:
+# Snaps the look to which horizontal direction the user was looking to
+func snapped_look_direction(look: Vector3) -> Vector3i:
 	look.y = 0.0 # Blocks can't face up or down
 	look = look.normalized() # Compensate the zeroed `y`
 	var direction = look.snappedf(sqrt(2.0))
@@ -65,7 +58,10 @@ func look_direction_to_face(look: Vector3) -> VoxelWorld.Face:
 		# two directions, pick one of them by rotating a little to the right.
 		# (since look can't be UP or DOWN, that sum can only be 1.0 or sqrt(2.0)
 		direction = look.rotated(Vector3.UP, deg_to_rad(1)).snappedf(sqrt(2.0))
-	return VoxelWorld.FACE_NORMALS_REVERSED[Vector3i(direction)]
+	return direction
+
+func look_direction_to_face(look: Vector3) -> VoxelWorld.Face:
+	return VoxelWorld.FACE_NORMALS_REVERSED[snapped_look_direction(look)]
 
 func _on_voxel_world_updated() -> void:
 	$StaticBody3D/CollisionShape3D.shape = $VoxelWorld.mesh.create_trimesh_shape()
@@ -78,29 +74,25 @@ func _on_player_connect_faces(from: Vector3, from_face: VoxelWorld.Face, to: Vec
 		printerr('cant connect block to itself')
 		return
 
-	var from_face_kind = $VoxelWorld.face_kind_from_block_face(from_coords, from_face)
-	var to_face_kind = $VoxelWorld.face_kind_from_block_face(to_coords, to_face)
-
-	if not VoxelWorld.is_kind_gate(from_face_kind):
-		printerr('from is not gate, not connecting')
+	var from_block = $VoxelWorld.blocks[from_coords]
+	var to_block = $VoxelWorld.blocks[to_coords]
+	if not VoxelWorld.is_block_gate(from_block.block_kind):
+		printerr('first block is not valid gate, cancelling connection')
 		return
-	if not VoxelWorld.is_kind_gate(to_face_kind):
-		printerr('to is not gate, not connecting')
-		return
-
-	if not VoxelWorld.is_kind_output(from_face_kind) or not VoxelWorld.is_kind_input(to_face_kind):
-		printerr('from is not output, or to is not input')
+	if not VoxelWorld.is_block_gate(to_block.block_kind):
+		printerr('second block is not valid gate, cancelling connection')
 		return
 
-	$VoxelWorld.update_face_uv(from_coords, from_face, from_face_kind)
-	$VoxelWorld.update_face_uv(to_coords, to_face, to_face_kind)
-	from = coordinate_to_position(from_coords)
-	to = coordinate_to_position(to_coords)
+	var from_output_offset = VoxelWorld.FACE_NORMALS[from_block.output_face] * (0.5 + Cable.CABLE_WIDTH / 2.0)
+	var to_input_offset = VoxelWorld.FACE_NORMALS[to_block.input_face] * (0.5 + Cable.CABLE_WIDTH / 2.0)
 
-	$CircuitSimulation.connect_blocks(from_coords, to_coords, from_face_kind == VoxelWorld.FaceKind.AND_OUTPUT, to_face_kind == VoxelWorld.FaceKind.AND_INPUT)
+	var success = $CircuitSimulation.connect_blocks(from_coords, to_coords, from_block.block_kind == VoxelWorld.BlockKind.AND, to_block.block_kind == VoxelWorld.BlockKind.AND)
+	if not success:
+		printerr('connection would create an illegal cycle, cancelling connection')
+		return
 
-	var cable_start = from + VoxelWorld.FACE_NORMALS[from_face] / 2.0
-	var cable_end = to + VoxelWorld.FACE_NORMALS[to_face] / 2.0
+	var cable_start = coordinate_to_position(from_coords) + from_output_offset
+	var cable_end = coordinate_to_position(to_coords) + to_input_offset
 	var cable = Cable.new(cable_start, cable_end)
 	self.add_child(cable)
 
@@ -110,3 +102,13 @@ func position_to_coordinate(pos: Vector3) -> Vector3i:
 
 func coordinate_to_position(coord: Vector3i) -> Vector3:
 	return Vector3(coord) + Vector3.ONE * 0.5
+
+func _on_player_reset_position():
+	player.position = player_initial_position
+	player.velocity = Vector3.ZERO
+
+func add_block_at_world_offset(pos: Vector3, face_kind: VoxelWorld.FaceKind, look_direction: Vector3):
+	add_block_at(position_to_coordinate(pos), face_kind, look_direction)
+
+func remove_block_at_world_offset(pos: Vector3):
+	remove_block_at(position_to_coordinate(pos))

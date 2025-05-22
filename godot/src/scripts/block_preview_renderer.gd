@@ -5,7 +5,7 @@ extends SubViewport
 
 func setup_block_and_camera(face_kind: VoxelWorld.FaceKind):
 	own_voxel_world.add_block(Vector3i.ZERO, face_kind)
-	if VoxelWorld.is_kind_blank(face_kind):
+	if VoxelWorld.is_face_blank(face_kind):
 		var input_face = VoxelWorld.blank_to_input(face_kind)
 		own_voxel_world.update_face_uv(Vector3i.ZERO, VoxelWorld.Face.FRONT, input_face)
 
