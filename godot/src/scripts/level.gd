@@ -19,9 +19,9 @@ func _ready():
 					var coordinate = Vector3i(x, y, z)
 					coordinate -= DIMENSIONS / 2 # centralize
 					coordinate.y -= 2
-					add_block_at(coordinate, VoxelWorld.FaceKind.STONE)
+					add_block_at(coordinate, VoxelWorld.BlockKind.STONE)
 
-func add_block_at(coordinate: Vector3i, face_kind: VoxelWorld.FaceKind, look_direction: Vector3 = Vector3.FORWARD):
+func add_block_at(coordinate: Vector3i, block_kind: VoxelWorld.BlockKind, look_direction: Vector3 = Vector3.FORWARD):
 	# Don't place a block if it collides with the player
 	var params := PhysicsShapeQueryParameters3D.new()
 	params.shape = BoxShape3D.new()
@@ -33,13 +33,13 @@ func add_block_at(coordinate: Vector3i, face_kind: VoxelWorld.FaceKind, look_dir
 			return
 
 	$VoxelWorld.disable_updates = true
-	$VoxelWorld.add_block(coordinate, face_kind)
+	$VoxelWorld.add_block(coordinate, block_kind)
 
-	if VoxelWorld.is_face_gate(face_kind):
+	if VoxelWorld.is_block_gate(block_kind):
 		var input_face = look_direction_to_face(-look_direction)
 		var output_face = look_direction_to_face(look_direction)
-		$VoxelWorld.update_face_uv($VoxelWorld.block_positions[-1], input_face, VoxelWorld.blank_to_input(face_kind))
-		$VoxelWorld.update_face_uv($VoxelWorld.block_positions[-1], output_face, VoxelWorld.blank_to_output(face_kind))
+		$VoxelWorld.update_face_uv($VoxelWorld.block_positions[-1], input_face, VoxelWorld.block_input_face(block_kind))
+		$VoxelWorld.update_face_uv($VoxelWorld.block_positions[-1], output_face, VoxelWorld.block_output_face(block_kind))
 		$VoxelWorld.blocks[Vector3i($VoxelWorld.block_positions[-1])].input_face = input_face
 		$VoxelWorld.blocks[Vector3i($VoxelWorld.block_positions[-1])].output_face = output_face
 	$VoxelWorld.disable_updates = false
@@ -107,8 +107,8 @@ func _on_player_reset_position():
 	player.position = player_initial_position
 	player.velocity = Vector3.ZERO
 
-func add_block_at_world_offset(pos: Vector3, face_kind: VoxelWorld.FaceKind, look_direction: Vector3):
-	add_block_at(position_to_coordinate(pos), face_kind, look_direction)
+func add_block_at_world_offset(pos: Vector3, block_kind: VoxelWorld.BlockKind, look_direction: Vector3):
+	add_block_at(position_to_coordinate(pos), block_kind, look_direction)
 
 func remove_block_at_world_offset(pos: Vector3):
 	remove_block_at(position_to_coordinate(pos))

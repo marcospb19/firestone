@@ -18,7 +18,6 @@ var is_esc_menu_open := false:
 
 func _ready():
 	update_selected_block(0)
-	set_hotbar_preview(VoxelWorld.FaceKind.AND_BLANK, 0)
 
 func update_visibility():
 	$OptionsMenu.visible = is_esc_menu_open
@@ -48,20 +47,20 @@ func update_selected_block(index: int):
 	hotbar_selection_rect.offset_left = x_hotbar_offset - HOTBAR_SELECTION_TEXTURE_SIZE * ICON_SCALE / 2.0
 	hotbar_selection_rect.offset_right = x_hotbar_offset + HOTBAR_SELECTION_TEXTURE_SIZE * ICON_SCALE / 2.0
 
-func update_hotbar_preview(index: int, face_kind: VoxelWorld.FaceKind):
-	set_hotbar_preview(face_kind, index)
+func update_hotbar_preview(index: int, block_kind: VoxelWorld.BlockKind):
+	set_hotbar_preview(block_kind, index)
 
 func get_element_offset(index: int) -> float:
 	const SQUARE_OVERFLOW = 2
 	return ((HOTBAR_SELECTION_TEXTURE_SIZE - SQUARE_OVERFLOW) * ICON_SCALE) * (index - 4)
 
-func set_hotbar_preview(face_kind: VoxelWorld.FaceKind, index: int):
+func set_hotbar_preview(block_kind: VoxelWorld.BlockKind, index: int):
 	var rect := TextureRect.new()
 	hotbar_previews_container.add_child(rect)
 
 	var preview_viewport: SubViewport = BLOCK_PREVIEW_RENDERER.instantiate()
 	rect.add_child(preview_viewport)
-	preview_viewport.setup_block_and_camera(face_kind)
+	preview_viewport.setup_block_and_camera(block_kind)
 
 	var x_hotbar_offset = get_element_offset(index)
 	rect.anchor_left = 0.5

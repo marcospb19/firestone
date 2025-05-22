@@ -4,7 +4,7 @@ extends CharacterBody3D
 @export var jump_strength := 8.0
 @export var gravity := 25.0
 
-signal add_block(at_offset: Vector3, face_kind: VoxelWorld.FaceKind, look_direction: Vector3)
+signal add_block(at_offset: Vector3, block_kind: VoxelWorld.BlockKind, look_direction: Vector3)
 signal remove_block(at_offset: Vector3)
 signal reset_position
 signal connect_faces(from: Vector3, from_face: VoxelWorld.Face, to: Vector3, to_face: VoxelWorld.Face)

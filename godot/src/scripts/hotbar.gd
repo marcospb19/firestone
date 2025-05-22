@@ -1,11 +1,11 @@
 class_name Hotbar
 
-const HOTBAR_ELEMENTS: Array[VoxelWorld.FaceKind] = [
-	VoxelWorld.FaceKind.DIRT,
-	VoxelWorld.FaceKind.STONE,
-	VoxelWorld.FaceKind.NOT_BLANK,
-	VoxelWorld.FaceKind.AND_BLANK,
-	VoxelWorld.FaceKind.OR_BLANK,
+const HOTBAR_ELEMENTS: Array[VoxelWorld.BlockKind] = [
+	VoxelWorld.BlockKind.DIRT,
+	VoxelWorld.BlockKind.STONE,
+	VoxelWorld.BlockKind.NOT,
+	VoxelWorld.BlockKind.AND,
+	VoxelWorld.BlockKind.OR,
 ]
 
 var __selected_index := 0

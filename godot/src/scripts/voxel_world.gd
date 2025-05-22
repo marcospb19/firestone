@@ -102,35 +102,19 @@ func _init():
 	mesh = ArrayMesh.new()
 	surface_array.resize(Mesh.ARRAY_MAX)
 
-# TODO: this function should receive BlockKind
-func add_block(pos: Vector3i, face_kind: FaceKind):
+func add_block(pos: Vector3i, block_kind: BlockKind):
 	if blocks.has(pos):
 		remove_block(pos)
 
-	var block_kind = null
-	match face_kind:
-		FaceKind.DIRT:
-			block_kind = BlockKind.DIRT
-		FaceKind.STONE:
-			block_kind = BlockKind.STONE
-		FaceKind.NOT_BLANK, FaceKind.NOT_INPUT, FaceKind.NOT_OUTPUT:
-			block_kind = BlockKind.NOT
-		FaceKind.AND_BLANK, FaceKind.AND_INPUT, FaceKind.AND_OUTPUT:
-			block_kind = BlockKind.AND
-		FaceKind.OR_BLANK, FaceKind.OR_INPUT, FaceKind.OR_OUTPUT:
-			block_kind = BlockKind.OR
+	var face_kind = block_kind_to_face_kind(block_kind)
 	blocks[pos] = BlockInfo.new(blocks.size(), block_kind, face_kind_repeat_array(face_kind))
 	block_positions.append(pos)
 
 	var uv_offset = BLOCKS_TEXTURE_UV_OFFSET[face_kind]
-	# # Pela checagem de vizinhos, o add face coloca uma quantidade dinâmica de
-	# # elementos nos arrays
+	# # Re-add this check after we have proper chunk handling
 	# #
-	# # Por conta disso, um swap_remove naive que assume tamanho fixo não vai
-	# # funcionar, preciso brainstormar como vou resolver
-	# #
-	# # Seria mais fácil resolver isso depois, quando esse código
-	# # inevitavelmente for portado para Rust (no futuuuro)
+	# # The way that we're currently doing swap_remove to remove blocks
+	# # from the list in O(1) time makes this a little harder to implement
 	#if not has_neighbor(Face.FRONT, pos):
 		#add_face(Face.FRONT, pos, uv_offset)
 	#if not has_neighbor(Face.RIGHT, pos):
@@ -251,7 +235,8 @@ static func is_block_gate(block_kind: BlockKind) -> bool:
 	match block_kind:
 		BlockKind.NOT, BlockKind.AND, BlockKind.OR:
 			return true
-	return false
+		_:
+			return false
 
 static func blank_to_input(kind: FaceKind) -> FaceKind:
 	return (kind + 1) as FaceKind
@@ -259,11 +244,60 @@ static func blank_to_input(kind: FaceKind) -> FaceKind:
 static func blank_to_output(kind: FaceKind) -> FaceKind:
 	return (kind + 2) as FaceKind
 
-func face_kind_from_block_face(coords: Vector3i, face: Face) -> FaceKind:
-	return blocks[coords].face_kinds[face]
-
 static func face_kind_repeat_array(face_kind: FaceKind) -> Array[FaceKind]:
 	return [
 		face_kind, face_kind, face_kind,
 		face_kind, face_kind, face_kind,
 	]
+
+static func block_kind_to_face_kind(block_kind: BlockKind):
+	match block_kind:
+		BlockKind.DIRT:
+			return FaceKind.DIRT
+		BlockKind.STONE:
+			return FaceKind.STONE
+		BlockKind.NOT:
+			return FaceKind.NOT_BLANK
+		BlockKind.AND:
+			return FaceKind.AND_BLANK
+		BlockKind.OR:
+			return FaceKind.OR_BLANK
+		_:
+			Utils.call('unreachable')
+
+static func block_output_face(block_kind: BlockKind):
+	match block_kind:
+		BlockKind.NOT:
+			return FaceKind.NOT_OUTPUT
+		BlockKind.AND:
+			return FaceKind.AND_OUTPUT
+		BlockKind.OR:
+			return FaceKind.OR_OUTPUT
+		_:
+			Utils.call('unreachable')
+
+static func block_input_face(block_kind: BlockKind):
+	match block_kind:
+		BlockKind.NOT:
+			return FaceKind.NOT_INPUT
+		BlockKind.AND:
+			return FaceKind.AND_INPUT
+		BlockKind.OR:
+			return FaceKind.OR_INPUT
+		_:
+			Utils.call('unreachable')
+
+static func face_kind_to_block_kind(face_kind: FaceKind):
+	match face_kind:
+		FaceKind.DIRT:
+			return BlockKind.DIRT
+		FaceKind.STONE:
+			return BlockKind.STONE
+		FaceKind.NOT_BLANK, FaceKind.NOT_INPUT, FaceKind.NOT_OUTPUT:
+			return BlockKind.NOT
+		FaceKind.AND_BLANK, FaceKind.AND_INPUT, FaceKind.AND_OUTPUT:
+			return BlockKind.AND
+		FaceKind.OR_BLANK, FaceKind.OR_INPUT, FaceKind.OR_OUTPUT:
+			return BlockKind.OR
+		_:
+			Utils.call('unreachable')
