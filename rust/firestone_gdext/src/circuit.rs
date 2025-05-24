@@ -2,11 +2,14 @@ use godot::prelude::*;
 use rustc_hash::FxHashMap;
 use simulation_engine::{ComponentId, ComponentKind, SimulationEngine};
 
+use crate::cable::Cable;
+
 #[derive(GodotClass)]
 #[class(base = Node)]
 struct CircuitSimulation {
     engine: SimulationEngine,
     blocks: FxHashMap<Vector3i, ComponentId>,
+    cables: FxHashMap<ComponentId, Vec<Gd<Cable>>>,
     base: Base<Node>,
     elapsed: f32,
 }
@@ -17,6 +20,7 @@ impl INode for CircuitSimulation {
         Self {
             engine: SimulationEngine::new(),
             blocks: FxHashMap::default(),
+            cables: FxHashMap::default(),
             base,
             elapsed: 0.0,
         }
@@ -28,8 +32,11 @@ impl INode for CircuitSimulation {
             godot_print!("Simulation tick {}", self.engine.current_tick());
             self.elapsed -= 1.0;
             self.engine.run_step();
-            for (a, b) in self.engine.components() {
-                godot_print!("{a:?} = {:?}", b.state.values());
+            for (id, component) in self.engine.components() {
+                for cable in self.cables.get_mut(&id).into_iter().flatten() {
+                    // TODO: remove `0`, consider multi-output gates
+                    cable.bind_mut().update_state(component.state.values()[0]);
+                }
             }
         }
     }
@@ -45,7 +52,6 @@ impl CircuitSimulation {
         is_from_and: bool,
         is_to_and: bool,
     ) -> bool {
-        godot_print!("connected blocks");
         let from_kind = if is_from_and {
             ComponentKind::And(2)
         } else {
@@ -80,5 +86,12 @@ impl CircuitSimulation {
             });
 
         self.engine.wire(from_id, to_id, 0, 0)
+    }
+
+    /// Registers a cable to have its color be updated every tick.
+    #[func]
+    fn register_cable(&mut self, pos: Vector3i, cable: Gd<Cable>) {
+        let component_id = self.blocks[&pos];
+        self.cables.entry(component_id).or_default().push(cable);
     }
 }

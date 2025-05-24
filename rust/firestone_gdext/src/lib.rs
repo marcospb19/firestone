@@ -1,5 +1,7 @@
-mod circuit;
+#![allow(irrefutable_let_patterns)]
 
+mod cable;
+mod circuit;
 use godot::{
     classes::{Engine, InputEventKey},
     global::Key,
@@ -58,7 +60,6 @@ impl Utils2 {
 
     #[func]
     fn refresh_rate_to_fps(refresh_rate: f32) -> u32 {
-        godot_print!("refresh rate: {}", refresh_rate);
         refresh_rate as u32 + (refresh_rate.fract() > f32::EPSILON) as u32
     }
 }

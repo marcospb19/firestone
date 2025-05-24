@@ -270,14 +270,6 @@ impl SimulationEngine {
             .flat_map(|(&component_id, edges)| edges.iter().map(move |&edge| (component_id, edge)))
     }
 
-    // fn outgoing_from(&self, id: ComponentId) -> impl Iterator<Item = (ComponentId, Edge)> {
-    //     self.outgoing_edges
-    //         .get(&id)
-    //         .into_iter()
-    //         .flatten()
-    //         .map(|(&a, &b)| (a, b))
-    // }
-
     fn subgraph_leaves(&self) -> impl Iterator<Item = ComponentId> {
         let is_leaf = |&node: &ComponentId| {
             self.tickless_dag

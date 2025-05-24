@@ -83,8 +83,8 @@ func _on_player_connect_faces(from: Vector3, from_face: VoxelWorld.Face, to: Vec
 		printerr('second block is not valid gate, cancelling connection')
 		return
 
-	var from_output_offset = VoxelWorld.FACE_NORMALS[from_block.output_face] * (0.5 + Cable.CABLE_WIDTH / 2.0)
-	var to_input_offset = VoxelWorld.FACE_NORMALS[to_block.input_face] * (0.5 + Cable.CABLE_WIDTH / 2.0)
+	var from_output_offset = VoxelWorld.FACE_NORMALS[from_block.output_face] * (0.5 + Cable.CABLE_WIDTH() / 2.0)
+	var to_input_offset = VoxelWorld.FACE_NORMALS[to_block.input_face] * (0.5 + Cable.CABLE_WIDTH() / 2.0)
 
 	var success = $CircuitSimulation.connect_blocks(from_coords, to_coords, from_block.block_kind == VoxelWorld.BlockKind.AND, to_block.block_kind == VoxelWorld.BlockKind.AND)
 	if not success:
@@ -93,8 +93,9 @@ func _on_player_connect_faces(from: Vector3, from_face: VoxelWorld.Face, to: Vec
 
 	var cable_start = coordinate_to_position(from_coords) + from_output_offset
 	var cable_end = coordinate_to_position(to_coords) + to_input_offset
-	var cable = Cable.new(cable_start, cable_end)
+	var cable = Cable.create(cable_start, cable_end)
 	self.add_child(cable)
+	$CircuitSimulation.register_cable(from_coords, cable)
 
 # Only works cause BLOCK_WIDTH == 1.0, TODO: maybe use Vector3.snapped?
 func position_to_coordinate(pos: Vector3) -> Vector3i:
