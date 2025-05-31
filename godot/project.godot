@@ -16,7 +16,6 @@ run/main_scene="uid://ctqae8e73sa1w"
 config/features=PackedStringArray("4.4", "Forward Plus")
 run/max_fps=1000
 boot_splash/bg_color=Color(0.272686, 0.177135, 0.207932, 1)
-run/physics_ticks_per_second=1000
 
 [audio]
 

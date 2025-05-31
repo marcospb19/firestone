@@ -3,7 +3,6 @@ class_name VoxelWorld extends MeshInstance3D
 signal updated
 
 const MESH_UPDATE_INTERVAL := 1.0 / 120.0
-const BLOCK_SIZE := 1.0
 
 enum Face { FRONT, RIGHT, BACK, LEFT, TOP, BOTTOM }
 enum FaceKind {
@@ -84,6 +83,10 @@ var normals := PackedVector3Array()
 var uvs := PackedVector2Array()
 var update_pending := false
 var disable_updates := false
+var block_size := 1.0:
+	set(value):
+		block_size = value
+		assert(blocks.size() == 0, "can't be updated after blocks are inserted")
 
 var blocks: Dictionary[Vector3i, BlockInfo] = {}
 var block_positions := PackedVector3Array() # Used as a stack
@@ -162,8 +165,8 @@ func has_neighbor(face: Face, pos: Vector3i) -> bool:
 func add_face(face: Face, pos: Vector3i, uv_offset: Vector2):
 	for triangle in FACE_TRIANGLES[face]:
 		for vertex_index in triangle:
-			var vertex = CUBE_VERTICES_MAPPING[vertex_index]
-			vertices.append(vertex + Vector3(pos))
+			var vertex = (CUBE_VERTICES_MAPPING[vertex_index] + Vector3(pos)) * block_size
+			vertices.append(vertex)
 			normals.append(Vector3(FACE_NORMALS[face]))
 
 	uvs.append(uv_offset + Vector2(0.0, 0.0))
@@ -319,9 +322,8 @@ static func snapped_look_direction(look: Vector3) -> Vector3i:
 		direction = look.rotated(Vector3.UP, deg_to_rad(1)).snappedf(sqrt(2.0))
 	return direction
 
-# Only works cause BLOCK_WIDTH == 1.0, TODO: maybe use Vector3.snapped?
-static func position_to_coordinate(pos: Vector3) -> Vector3i:
-	return pos.floor()
+func position_to_coordinate(pos: Vector3) -> Vector3i:
+	return (pos / block_size).floor()
 
-static func coordinate_to_position(coord: Vector3i) -> Vector3:
-	return Vector3(coord) + Vector3.ONE * 0.5
+func coordinate_to_position(coord: Vector3i) -> Vector3:
+	return Vector3(coord) * block_size # + Vector3.ONE * block_size / 2.0
