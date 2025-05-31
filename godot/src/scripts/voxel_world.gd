@@ -1,7 +1,9 @@
 class_name VoxelWorld extends MeshInstance3D
 
 signal updated
+
 const MESH_UPDATE_INTERVAL := 1.0 / 120.0
+const BLOCK_SIZE := 1.0
 
 enum Face { FRONT, RIGHT, BACK, LEFT, TOP, BOTTOM }
 enum FaceKind {
@@ -301,3 +303,25 @@ static func face_kind_to_block_kind(face_kind: FaceKind):
 			return BlockKind.OR
 		_:
 			Utils.call('unreachable')
+
+static func look_direction_to_face(look: Vector3) -> Face:
+	return FACE_NORMALS_REVERSED[snapped_look_direction(look)]
+
+# Snaps the look to which horizontal direction the user was looking to
+static func snapped_look_direction(look: Vector3) -> Vector3i:
+	look.y = 0.0 # Blocks can't face up or down
+	look = look.normalized() # Compensate the zeroed `y`
+	var direction = look.snappedf(sqrt(2.0))
+	if not is_equal_approx(absf(direction.x) + absf(direction.y) + absf(direction.z), 1.0):
+		# If you're perfectly aiming at Vector3(sqrt(2.0), 0.0, sqrt(2.0)), you'll be in-between
+		# two directions, pick one of them by rotating a little to the right.
+		# (since look can't be UP or DOWN, that sum can only be 1.0 or sqrt(2.0)
+		direction = look.rotated(Vector3.UP, deg_to_rad(1)).snappedf(sqrt(2.0))
+	return direction
+
+# Only works cause BLOCK_WIDTH == 1.0, TODO: maybe use Vector3.snapped?
+static func position_to_coordinate(pos: Vector3) -> Vector3i:
+	return pos.floor()
+
+static func coordinate_to_position(coord: Vector3i) -> Vector3:
+	return Vector3(coord) + Vector3.ONE * 0.5

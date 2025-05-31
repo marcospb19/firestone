@@ -20,7 +20,7 @@ const COOLDOWN_AFTER_FAST_PLACE := 0.5
 const MOUSE_SENSITIVITY := 0.00065
 
 var edit_block_timer: SceneTreeTimer
-var is_flying := true
+var is_flying := false
 var is_flying_toggle_timer: SceneTreeTimer
 var is_zooming := false
 var hotbar := Hotbar.new() # Tells what blocks are in what position, not the best abstraction
