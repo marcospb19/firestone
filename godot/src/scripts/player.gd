@@ -20,7 +20,7 @@ const COOLDOWN_AFTER_FAST_PLACE := 0.5
 const MOUSE_SENSITIVITY := 0.00065
 
 var edit_block_timer: SceneTreeTimer
-var is_flying := true
+var is_flying := false
 var is_flying_toggle_timer: SceneTreeTimer
 var is_zooming := false
 var hotbar := Hotbar.new() # Tells what blocks are in what position, not the best abstraction
@@ -33,12 +33,13 @@ var pending_connection_face = null
 @onready var player_ui: Control = $PlayerUI
 
 func _ready():
+	Utils.set_main_camera(camera)
+	Input.set_use_accumulated_input(false)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	Engine.max_fps = Utils2.refresh_rate_to_fps(DisplayServer.screen_get_refresh_rate())
-	Utils.set_main_camera(camera)
+
 	edit_block_timer = self.get_tree().create_timer(0)
 	is_flying_toggle_timer = self.get_tree().create_timer(0)
-	Input.set_use_accumulated_input(false)
 	for i in hotbar.HOTBAR_ELEMENTS.size():
 		player_ui.update_hotbar_preview(i, hotbar.HOTBAR_ELEMENTS[i])
 
@@ -58,19 +59,19 @@ func _input(event):
 			player_ui.update_selected_block(hotbar.get_selected_index())
 
 func _process(delta: float):
-	apply_gravity(delta)
+	__apply_gravity(delta)
 	if Utils.is_mouse_captured():
 		if Input.is_action_just_pressed("f1"):
 			player_ui.f1_hide_hud = not player_ui.f1_hide_hud
 		if Input.is_action_just_pressed("r"):
 			reset_position.emit()
-		handle_movement()
-		handle_block_manipulation()
-		handle_block_connecting()
-		handle_zooming()
+		__handle_movement()
+		__handle_block_manipulation()
+		__handle_block_connecting()
+		__handle_zooming()
 	self.move_and_slide()
 
-func handle_movement():
+func __handle_movement():
 	if Input.is_action_just_pressed("jump"):
 		if is_flying_toggle_timer.time_left > 0.0:
 			is_flying = not is_flying
@@ -78,12 +79,12 @@ func handle_movement():
 
 	if is_flying:
 		var y_multiplier = int(Input.is_action_pressed("jump")) - int(Input.is_action_pressed("ctrl"))
-		velocity.y = jump_strength * y_multiplier
+		self.velocity.y = jump_strength * y_multiplier
 	else:
 		if self.is_on_floor():
-			velocity.y = 0.0
+			self.velocity.y = 0.0
 			if Input.is_action_pressed("jump"):
-				velocity.y = max(jump_strength, velocity.y + jump_strength / 2.0)
+				self.velocity.y = max(jump_strength, self.velocity.y + jump_strength / 2.0)
 
 	var input = Input.get_vector("move-left", "move-right", "move-forward", "move-back")
 	var speed := (
@@ -92,12 +93,12 @@ func handle_movement():
 			* (FLYING_SPEED_MULTIPLIER if is_flying else 1.0)
 	)
 	var wasd_movement := input.limit_length(1.0) * speed
-	velocity = Vector3(wasd_movement.x, velocity.y, wasd_movement.y)
-	if velocity.z < 0.0:
-		velocity.z *= RUN_SPEED_MULTIPLIER
-	velocity = transform.basis * velocity
+	self.velocity = Vector3(wasd_movement.x, self.velocity.y, wasd_movement.y)
+	if self.velocity.z < 0.0:
+		self.velocity.z *= RUN_SPEED_MULTIPLIER
+	self.velocity = self.transform.basis * self.velocity
 
-func handle_block_connecting():
+func __handle_block_connecting():
 	if Input.is_action_just_pressed("e"):
 		raycast.force_raycast_update()
 		if raycast.is_colliding():
@@ -117,7 +118,7 @@ var is_fast_adding := false
 # If player holds to add blocks, make sure they're all facing the same direction
 var add_block_look_direction
 
-func handle_block_manipulation():
+func __handle_block_manipulation():
 	var left = Input.is_action_pressed("mouse-left")
 	var right = Input.is_action_pressed("mouse-right")
 	var pressed_left = Input.is_action_just_pressed("mouse-left")
@@ -140,17 +141,17 @@ func handle_block_manipulation():
 	var should_slow_add = pressed_right or (right and edit_block_timer.time_left == 0.0)
 
 	if is_fast_removing:
-		try_edit_block(true, false)
+		__try_edit_block(true, false)
 	elif is_fast_adding:
-		try_edit_block(true, true)
+		__try_edit_block(true, true)
 	elif should_slow_remove:
-		try_edit_block(false, false)
+		__try_edit_block(false, false)
 	elif should_slow_add:
-		try_edit_block(false, true)
+		__try_edit_block(false, true)
 	elif not left and not right:
 		add_block_look_direction = null
 
-func try_edit_block(fast: bool, is_add: bool):
+func __try_edit_block(fast: bool, is_add: bool):
 	if edit_block_timer.time_left != 0.0:
 		return
 
@@ -179,7 +180,7 @@ func try_edit_block(fast: bool, is_add: bool):
 
 var previous_fov = null
 
-func handle_zooming():
+func __handle_zooming():
 	if Input.is_action_just_pressed("zoom"):
 		is_zooming = not is_zooming
 		if is_zooming:
@@ -190,6 +191,6 @@ func handle_zooming():
 			camera.set_fov(previous_fov)
 			previous_fov = null
 
-func apply_gravity(delta: float):
+func __apply_gravity(delta: float):
 	if not is_flying:
-		velocity.y -= gravity * delta
+		self.velocity.y -= gravity * delta

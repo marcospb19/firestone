@@ -1,11 +1,13 @@
 extends Node3D
 
 const DIMENSIONS := Vector3i(16, 1, 16)
-const BLOCK_SIZE := 1.0
+const BLOCK_SIZE := 0.5
 
-@onready var player = $Player
-@onready var player_initial_position = player.position
+@onready var player: CharacterBody3D = $Player
+@onready var initial_player_position = player.position
 @onready var voxel_world: VoxelWorld = $VoxelWorld
+@onready var collision_shape: CollisionShape3D = $StaticBody3D/CollisionShape3D
+var world_scale_tween: Tween
 
 func _ready():
 	voxel_world.block_size = BLOCK_SIZE
@@ -21,6 +23,23 @@ func _ready():
 				coordinate -= DIMENSIONS / 2 # centralize
 				coordinate.y -= 2.0
 				add_block_at(coordinate, voxel_world.BlockKind.STONE)
+
+func _process(_delta: float):
+	if world_scale_tween == null or not world_scale_tween.is_valid():
+		var scale_world_exponent = int(Input.is_action_just_pressed('f')) - int(Input.is_action_just_pressed('g'))
+		if scale_world_exponent != 0:
+			var current_scale = voxel_world.scale
+			var target_scale = current_scale * pow(2, scale_world_exponent) # Either double or halve it
+			world_scale_tween = self.get_tree().create_tween()
+			world_scale_tween.tween_method(__update_world_scale, current_scale, target_scale, 1.0).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_CUBIC)
+
+func __update_world_scale(new_scale: Vector3):
+	var previous_scale = voxel_world.scale
+	collision_shape.scale = new_scale
+	voxel_world.scale = new_scale
+	var scale_diff = new_scale / previous_scale
+	player.position *= scale_diff
+	player.player_ui.update_player_scale(1.0 / new_scale.x)
 
 func add_block_at_world_offset(pos: Vector3, block_kind: VoxelWorld.BlockKind, look_direction: Vector3):
 	add_block_at(voxel_world.position_to_coordinate(pos), block_kind, look_direction)
@@ -52,8 +71,8 @@ func add_block_at(coordinate: Vector3i, block_kind: VoxelWorld.BlockKind, look_d
 func remove_block_at_world_offset(pos: Vector3):
 	voxel_world.remove_block(voxel_world.position_to_coordinate(pos))
 
-func _on_voxel_world_updated() -> void:
-	$StaticBody3D/CollisionShape3D.shape = voxel_world.mesh.create_trimesh_shape()
+func _on_voxel_world_updated():
+	collision_shape.shape = voxel_world.mesh.create_trimesh_shape()
 
 func _on_player_connect_faces(from: Vector3, _from_face: VoxelWorld.Face, to: Vector3, _to_face: VoxelWorld.Face):
 	var from_coords = voxel_world.position_to_coordinate(from)
@@ -87,5 +106,5 @@ func _on_player_connect_faces(from: Vector3, _from_face: VoxelWorld.Face, to: Ve
 	$CircuitSimulation.register_cable(from_coords, cable)
 
 func _on_player_reset_position():
-	player.position = player_initial_position
+	player.position = initial_player_position
 	player.velocity = Vector3.ZERO

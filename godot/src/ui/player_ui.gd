@@ -28,6 +28,9 @@ func update_visibility():
 	else:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
+func update_player_scale(new_scale: float):
+	$RightSideUI/MarginContainer/Label.text = 'Player Scale: %.2f' % new_scale
+
 func _notification(what):
 	if what == MainLoop.NOTIFICATION_APPLICATION_FOCUS_OUT:
 		is_esc_menu_open = true

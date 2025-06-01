@@ -323,7 +323,7 @@ static func snapped_look_direction(look: Vector3) -> Vector3i:
 	return direction
 
 func position_to_coordinate(pos: Vector3) -> Vector3i:
-	return (pos / block_size).floor()
+	return (pos / block_size / self.scale).floor()
 
 func coordinate_to_position(coord: Vector3i) -> Vector3:
-	return Vector3(coord) * block_size # + Vector3.ONE * block_size / 2.0
+	return Vector3(coord) * block_size * self.scale

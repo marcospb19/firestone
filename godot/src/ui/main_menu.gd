@@ -1,6 +1,6 @@
 extends Control
 
-func _ready() -> void:
+func _ready():
 	# A corner case, as this is the project entry point, it needs call this to
 	# be cleanable later, it's a detail of how SceneController works
 	self.add_to_group(SceneController.MAIN_SCENE_GROUP_NAME)

@@ -12,7 +12,7 @@ sky_material = SubResource("ShaderMaterial_x32ix")
 background_mode = 2
 background_color = Color(0.41, 0.41, 0.41, 1)
 sky = SubResource("Sky_3vlxe")
-ambient_light_source = 3
+ambient_light_source = 2
 ambient_light_color = Color(1, 1, 1, 1)
 ambient_light_sky_contribution = 0.0
 tonemap_mode = 2
@@ -20,10 +20,7 @@ ssao_enabled = true
 ssao_intensity = 2.5
 ssao_power = 1.75
 
-[node name="EnvironmentRoot" type="Node3D"]
+[node name="EnvironmentRoot" type="Node"]
 
 [node name="Environment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_elqe6")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-sky_mode = 2
